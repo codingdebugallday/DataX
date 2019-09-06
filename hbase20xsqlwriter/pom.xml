@@ -34,6 +34,19 @@
             <groupId>com.aliyun.phoenix</groupId>
             <artifactId>ali-phoenix-shaded-thin-client</artifactId>
             <version>${phoenix.version}</version>
+            <!--添加-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--添加-->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.1-b11</version>
         </dependency>
 
         <!-- for test -->
