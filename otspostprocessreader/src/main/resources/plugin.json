@@ -1,0 +1,6 @@
+{
+    "name": "otspostprocessreader",
+    "class": "org.abigballofmud.datax.plugin.reader.otspostprocessreader.OtsPostProcessReader",
+    "description": "",
+    "developer": "abigballofmud"
+}
