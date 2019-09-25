@@ -253,6 +253,7 @@ HdfsWriter提供向HDFS文件系统指定路径中写入TEXTFile文件和ORCFile
 	* 描述：写入数据到目的表前，会先执行这里的标准语句。 <br />
     
     * 注意：执行原理是hive -e "select col1,col2 from table",由于是双引号包围，写的sql最好是用单引号。
+    以及该台节点作为hive client。
     
 	* 必选：否 <br />
 
@@ -263,6 +264,7 @@ HdfsWriter提供向HDFS文件系统指定路径中写入TEXTFile文件和ORCFile
 	* 描述：写入数据到目的表后，会执行这里的标准语句。（原理同 preSql ） <br />
 
     * 注意：执行原理是hive -e "select col1,col2 from table",由于是双引号包围，写的sql最好是用单引号。
+    以及该台节点作为hive client。
     
 	* 必选：否 <br />
 
