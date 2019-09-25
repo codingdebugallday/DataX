@@ -1,0 +1,15 @@
+{
+  "name": "hdfspluswriter",
+  "parameter": {
+    "defaultFS": "",
+    "fileType": "",
+    "path": "",
+    "fileName": "",
+    "column": [],
+    "writeMode": "",
+    "fieldDelimiter": "",
+    "compress": "",
+    "preSql": [],
+    "postSql": []
+  }
+}
