@@ -96,13 +96,13 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-		<fileSet>
-             <directory>otsstreamreader/target/datax/</directory>
-             <includes>
-                 <include>**/*.*</include>
-             </includes>
-             <outputDirectory>datax</outputDirectory>
-         </fileSet>
+        <fileSet>
+            <directory>otsstreamreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
         <fileSet>
             <directory>txtfilereader/target/datax/</directory>
             <includes>
@@ -167,7 +167,7 @@
             <outputDirectory>datax</outputDirectory>
         </fileSet>
 
-        writer
+        <!--writer-->
         <fileSet>
             <directory>mysqlwriter/target/datax/</directory>
             <includes>
@@ -343,23 +343,23 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
+
+        <!--自定义插件 reader-->
+        <fileSet>
+            <directory>otspostprocessreader/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+
+        <!--自定义插件 writer-->
+        <fileSet>
+            <directory>hdfspluswriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
     </fileSets>
-
-    <!--自定义插件 reader-->
-    <fileSet>
-        <directory>otspostprocessreader/target/datax/</directory>
-        <includes>
-            <include>**/*.*</include>
-        </includes>
-        <outputDirectory>datax</outputDirectory>
-    </fileSet>
-
-    <!--自定义插件 writer-->
-    <fileSet>
-        <directory>hdfspluswriter/target/datax/</directory>
-        <includes>
-            <include>**/*.*</include>
-        </includes>
-        <outputDirectory>datax</outputDirectory>
-    </fileSet>
 </assembly>
