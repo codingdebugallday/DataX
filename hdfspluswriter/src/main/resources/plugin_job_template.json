@@ -9,6 +9,8 @@
     "writeMode": "",
     "fieldDelimiter": "",
     "compress": "",
+    "dropImportDelims": false,
+    "delimsReplacement": "",
     "preSql": [],
     "postSql": []
   }

@@ -44,6 +44,8 @@ public class HdfsPlusWriter extends Writer {
         private String compress;
         private String encoding;
         private List<String> preSqlList;
+        private Boolean dropImportDelims;
+        private String delimsReplacement;
         private HashSet<String> tmpFiles = new HashSet<String>();//临时文件全路径
         private HashSet<String> endFiles = new HashSet<String>();//最终文件全路径
 
@@ -164,6 +166,16 @@ public class HdfsPlusWriter extends Writer {
             List<String> postSqlList = this.writerSliceConfig.getList(Key.POST_SQL, String.class);
             if (!CollectionUtils.isEmpty(postSqlList)) {
                 this.writerSliceConfig.set(Key.POST_SQL, postSqlList);
+            }
+            // dropImportDelims delimsReplacement check
+            // Cannot be used at the same time
+            dropImportDelims = this.writerSliceConfig.getBool(Key.DROP_IMPORT_DELIMS, false);
+            this.writerSliceConfig.set(Key.DROP_IMPORT_DELIMS, dropImportDelims);
+            if (!dropImportDelims) {
+                delimsReplacement = this.writerSliceConfig.getString(Key.DELIMS_REPLACEMENT);
+                if (StringUtils.isNotBlank(delimsReplacement)) {
+                    this.writerSliceConfig.set(Key.DROP_IMPORT_DELIMS, dropImportDelims);
+                }
             }
         }
 
@@ -364,6 +376,8 @@ public class HdfsPlusWriter extends Writer {
         private String fileType;
         private String fileName;
         private List<String> postSqlList;
+        private Boolean dropImportDelims;
+        private String delimsReplacement;
 
         private HdfsHelper hdfsHelper = null;
 
@@ -376,6 +390,8 @@ public class HdfsPlusWriter extends Writer {
             //得当的已经是绝对路径，eg：hdfs://10.101.204.12:9000/user/hive/warehouse/writer.db/text/test.textfile
             this.fileName = this.writerSliceConfig.getString(Key.FILE_NAME);
             this.postSqlList = this.writerSliceConfig.getList(Key.POST_SQL, String.class);
+            this.dropImportDelims = this.writerSliceConfig.getBool(Key.DROP_IMPORT_DELIMS);
+            this.delimsReplacement = this.writerSliceConfig.getString(Key.DELIMS_REPLACEMENT);
 
             hdfsHelper = new HdfsHelper();
             hdfsHelper.getFileSystem(defaultFS, writerSliceConfig);
@@ -390,14 +406,16 @@ public class HdfsPlusWriter extends Writer {
         public void startWrite(RecordReceiver lineReceiver) {
             LOG.info("begin do write...");
             LOG.info("write to file : [{}]", this.fileName);
+            // 字段中的\n, \r, and \01是删除，还是替换
+            LOG.info("dropImportDelims: {}, delimsReplacement:{} ...", dropImportDelims, delimsReplacement);
             if (SupportHiveFileType.TEXT.name().equalsIgnoreCase(fileType)) {
                 //写TEXT FILE
                 hdfsHelper.textFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                        this.getTaskPluginCollector(), this.dropImportDelims, this.delimsReplacement);
             } else if (SupportHiveFileType.ORC.name().equalsIgnoreCase(fileType)) {
                 //写ORC FILE
                 hdfsHelper.orcFileStartWrite(lineReceiver, this.writerSliceConfig, this.fileName,
-                        this.getTaskPluginCollector());
+                        this.getTaskPluginCollector(), this.dropImportDelims, this.delimsReplacement);
             }
 
             LOG.info("end do write");

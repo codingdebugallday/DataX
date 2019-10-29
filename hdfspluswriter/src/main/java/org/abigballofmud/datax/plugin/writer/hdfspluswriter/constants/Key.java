@@ -43,7 +43,16 @@ public final class Key {
      * not must
      */
     public static final String POST_SQL = "postSql";
-
+    /**
+     * not must
+     * 删除字段中的\n, \r, and \01
+     */
+    public static final String DROP_IMPORT_DELIMS = "dropImportDelims";
+    /**
+     * not must
+     * 替换字段中的\n, \r, and \01
+     */
+    public static final String DELIMS_REPLACEMENT = "delimsReplacement";
 
     /**
      * must have

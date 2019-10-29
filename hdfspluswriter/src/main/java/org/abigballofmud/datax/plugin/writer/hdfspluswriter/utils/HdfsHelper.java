@@ -295,8 +295,12 @@ public class HdfsHelper {
      * @param fileName
      * @param taskPluginCollector
      */
-    public void textFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
-                                   TaskPluginCollector taskPluginCollector) {
+    public void textFileStartWrite(RecordReceiver lineReceiver,
+                                   Configuration config,
+                                   String fileName,
+                                   TaskPluginCollector taskPluginCollector,
+                                   Boolean dropImportDelims,
+                                   String delimsReplacement) {
         char fieldDelimiter = config.getChar(Key.FIELD_DELIMITER);
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, null);
@@ -317,9 +321,10 @@ public class HdfsHelper {
         }
         try {
             RecordWriter writer = outFormat.getRecordWriter(fileSystem, conf, outputPath.toString(), Reporter.NULL);
-            Record record = null;
+            Record record;
             while ((record = lineReceiver.getFromReader()) != null) {
-                MutablePair<Text, Boolean> transportResult = transportOneRecord(record, fieldDelimiter, columns, taskPluginCollector);
+                MutablePair<Text, Boolean> transportResult = transportOneRecord(record, fieldDelimiter, columns, taskPluginCollector,
+                        dropImportDelims, delimsReplacement);
                 if (!transportResult.getRight()) {
                     writer.write(NullWritable.get(), transportResult.getLeft());
                 }
@@ -334,9 +339,14 @@ public class HdfsHelper {
         }
     }
 
-    public static MutablePair<Text, Boolean> transportOneRecord(
-            Record record, char fieldDelimiter, List<Configuration> columnsConfiguration, TaskPluginCollector taskPluginCollector) {
-        MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector);
+    public static MutablePair<Text, Boolean> transportOneRecord(Record record,
+                                                                char fieldDelimiter,
+                                                                List<Configuration> columnsConfiguration,
+                                                                TaskPluginCollector taskPluginCollector,
+                                                                Boolean dropImportDelims,
+                                                                String delimsReplacement) {
+        MutablePair<List<Object>, Boolean> transportResultList = transportOneRecord(record, columnsConfiguration, taskPluginCollector,
+                dropImportDelims, delimsReplacement);
         //保存<转换后的数据,是否是脏数据>
         MutablePair<Text, Boolean> transportResult = new MutablePair<Text, Boolean>();
         transportResult.setRight(false);
@@ -377,7 +387,9 @@ public class HdfsHelper {
      * @param taskPluginCollector
      */
     public void orcFileStartWrite(RecordReceiver lineReceiver, Configuration config, String fileName,
-                                  TaskPluginCollector taskPluginCollector) {
+                                  TaskPluginCollector taskPluginCollector,
+                                  Boolean dropImportDelims,
+                                  String delimsReplacement) {
         List<Configuration> columns = config.getListConfiguration(Key.COLUMN);
         String compress = config.getString(Key.COMPRESS, null);
         List<String> columnNames = getColumnNames(columns);
@@ -398,7 +410,8 @@ public class HdfsHelper {
             RecordWriter writer = outFormat.getRecordWriter(fileSystem, conf, fileName, Reporter.NULL);
             Record record = null;
             while ((record = lineReceiver.getFromReader()) != null) {
-                MutablePair<List<Object>, Boolean> transportResult = transportOneRecord(record, columns, taskPluginCollector);
+                MutablePair<List<Object>, Boolean> transportResult = transportOneRecord(record, columns, taskPluginCollector,
+                        dropImportDelims, delimsReplacement);
                 if (!transportResult.getRight()) {
                     writer.write(NullWritable.get(), orcSerde.serialize(transportResult.getLeft(), inspector));
                 }
@@ -495,10 +508,11 @@ public class HdfsHelper {
         return orcSerde;
     }
 
-    public static MutablePair<List<Object>, Boolean> transportOneRecord(
-            Record record, List<Configuration> columnsConfiguration,
-            TaskPluginCollector taskPluginCollector) {
-
+    public static MutablePair<List<Object>, Boolean> transportOneRecord(Record record,
+                                                                        List<Configuration> columnsConfiguration,
+                                                                        TaskPluginCollector taskPluginCollector,
+                                                                        Boolean dropImportDelims,
+                                                                        String delimsReplacement) {
         MutablePair<List<Object>, Boolean> transportResult = new MutablePair<List<Object>, Boolean>();
         transportResult.setRight(false);
         List<Object> recordList = Lists.newArrayList();
@@ -509,7 +523,25 @@ public class HdfsHelper {
                 column = record.getColumn(i);
                 //todo as method
                 if (null != column.getRawData()) {
-                    String rowData = column.getRawData().toString();
+                    // 不论是在textfile 还是 orc 都会执行到这里 所以在这里进行字段中的\n, \r, and \01是删除，还是替换
+                    String rowData;
+                    if (dropImportDelims) {
+                        // 删除
+                        rowData = column.getRawData().toString()
+                                .replace("\\n", "")
+                                .replace("\\r", "")
+                                .replace("\u0001", "");
+                    } else {
+                        // 是否替换
+                        if (StringUtils.isNotBlank(delimsReplacement)) {
+                            rowData = column.getRawData().toString()
+                                    .replace("\\n", delimsReplacement)
+                                    .replace("\\r", delimsReplacement)
+                                    .replace("\u0001", delimsReplacement);
+                        } else {
+                            rowData = column.getRawData().toString();
+                        }
+                    }
                     SupportHiveDataType columnType = SupportHiveDataType.valueOf(
                             columnsConfiguration.get(i).getString(Key.TYPE).toUpperCase());
                     //根据writer端类型配置做类型转换
@@ -525,27 +557,27 @@ public class HdfsHelper {
                                 recordList.add(Integer.valueOf(rowData));
                                 break;
                             case BIGINT:
-                                recordList.add(column.asLong());
+                                recordList.add(Long.valueOf(rowData));
                                 break;
                             case FLOAT:
                                 recordList.add(Float.valueOf(rowData));
                                 break;
                             case DOUBLE:
-                                recordList.add(column.asDouble());
+                                recordList.add(Double.valueOf(rowData));
                                 break;
                             case STRING:
                             case VARCHAR:
                             case CHAR:
-                                recordList.add(column.asString());
+                                recordList.add(rowData);
                                 break;
                             case BOOLEAN:
-                                recordList.add(column.asBoolean());
+                                recordList.add(Boolean.valueOf(rowData));
                                 break;
                             case DATE:
-                                recordList.add(new java.sql.Date(column.asDate().getTime()));
+                                recordList.add(new java.sql.Date(new Date(Long.parseLong(rowData)).getTime()));
                                 break;
                             case TIMESTAMP:
-                                recordList.add(new java.sql.Timestamp(column.asDate().getTime()));
+                                recordList.add(new java.sql.Timestamp(new Date(Long.parseLong(rowData)).getTime()));
                                 break;
                             default:
                                 throw DataXException

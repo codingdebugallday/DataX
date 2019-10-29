@@ -98,7 +98,7 @@
         <module>hbase20xsqlwriter</module>
 
         <!--自定义插件 reader-->
-        <module>otspostprocessreader</module>
+<!--        <module>otspostprocessreader</module>-->
 
         <!--自定义插件 writer-->
         <module>hdfspluswriter</module>
