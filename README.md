@@ -2,13 +2,16 @@
 
 **基于DataX自定义插件，已自定义插件：** 
 
-- ##### [otspostprocessreader](https://github.com/codingdebugallday/DataX/blob/master/otspostprocessreader/doc/otspostprocessreader.md)
+- ##### [otsplusreader](https://github.com/codingdebugallday/DataX/blob/master/otsplusreader/doc/otsplusreader.md)
 
         可以对ots的字段进行加密解密操作
 
 - ##### [hdfspluswriter](https://github.com/codingdebugallday/DataX/blob/master/hdfspluswriter/doc/hdfspluswriter.md)
 
-        在hdfswriter基础上，做了增强处理，增加preSql,postSql,跟mysqlWriter中的preSql,postSql一样
+        在hdfswriter基础上，做了增强处理: 
+        1. 增加preSql，postSql，跟mysqlWriter中的preSql，postSql一样
+        2. 增加delimsReplacement，dropImportDelims，对字段中的\n, \r, and \01处理，跟sqoop类似
+        
 
 # DataX
 

@@ -1,0 +1,6 @@
+{
+    "name": "otsplusreader",
+    "class": "org.abigballofmud.datax.plugin.reader.otsplusreader.OtsPlusReader",
+    "description": "",
+    "developer": "abigballofmud"
+}
