@@ -1,5 +1,5 @@
 
-# OTSPostProcessReader 插件文档
+# otsplusreader 插件文档
 
 
 ___
@@ -7,7 +7,7 @@ ___
 
 ## 1 快速介绍
 
-OTSPostProcessReader插件实现了从OTS读取数据，并可以通过用户指定抽取数据范围可方便的实现数据增量抽取的需求。目前支持三种抽取方式：
+otsplusreader插件实现了从OTS读取数据，并可以通过用户指定抽取数据范围可方便的实现数据增量抽取的需求。目前支持三种抽取方式：
 
 * 全表抽取
 * 范围抽取
@@ -17,9 +17,9 @@ OTS是构建在阿里云飞天分布式系统之上的 NoSQL数据库服务，�
 
 ## 2 实现原理
 
-简而言之，otspostprocessreader通过OTS官方Java SDK连接到OTS服务端，获取并按照DataX官方协议标准转为DataX字段信息传递给下游Writer端。
+简而言之，otsplusreader通过OTS官方Java SDK连接到OTS服务端，获取并按照DataX官方协议标准转为DataX字段信息传递给下游Writer端。
 
-otspostprocessreader会根据OTS的表范围，按照Datax并发的数目N，将范围等分为N份Task。每个Task都会有一个otspostprocessreader线程来执行。
+otsplusreader会根据OTS的表范围，按照Datax并发的数目N，将范围等分为N份Task。每个Task都会有一个otsplusreader线程来执行。
 
 ## 3 功能说明
 
@@ -80,7 +80,7 @@ otspostprocessreader会根据OTS的表范围，按照Datax并发的数目N，将
 }
 ```
 
-* 配置一个定义抽取范围的otspostprocessreader：
+* 配置一个定义抽取范围的otsplusreader：
 
 ```
 {
@@ -190,15 +190,15 @@ otspostprocessreader会根据OTS的表范围，按照Datax并发的数目N，将
 
 * **column**
 
-	* 描述：所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。由于OTS本身是NoSQL系统，在otspostprocessreader抽取数据过程中，必须指定相应地字段名称。
+	* 描述：所配置的表中需要同步的列名集合，使用JSON的数组描述字段信息。由于OTS本身是NoSQL系统，在otsplusreader抽取数据过程中，必须指定相应地字段名称。
 
 		支持普通的列读取，例如: {"name":"col1"}
 
-		支持部分列读取，如用户不配置该列，则otspostprocessreader不予读取。
+		支持部分列读取，如用户不配置该列，则otsplusreader不予读取。
 
 		支持常量列读取，例如: {"type":"STRING", "value" : "DataX"}。使用type描述常量类型，目前支持STRING、INT、DOUBLE、BOOL、BINARY(用户使用Base64编码填写)、INF_MIN(OTS的系统限定最小值，使用该值用户不能填写value属性，否则报错)、INF_MAX(OTS的系统限定最大值，使用该值用户不能填写value属性，否则报错)。
 
-		不支持函数或者自定义表达式，由于OTS本身不提供类似SQL的函数或者表达式功能，otspostprocessreader也不能提供函数或表达式列功能。
+		不支持函数或者自定义表达式，由于OTS本身不提供类似SQL的函数或者表达式功能，otsplusreader也不能提供函数或表达式列功能。
 
 	* 必选：是 <br />
 
@@ -243,7 +243,7 @@ otspostprocessreader会根据OTS的表范围，按照Datax并发的数目N，将
 
 * **split**
 
-	* 描述：该配置项属于高级配置项，是用户自己定义切分配置信息，普通情况下不建议用户使用。适用场景通常在OTS数据存储发生热点，使用otspostprocessreader自动切分的策略不能生效情况下，使用用户自定义的切分规则。split指定是的在Begin、End区间内的切分点，且只能是partitionKey的切分点信息，即在split仅配置partitionKey，而不需要指定全部的PrimaryKey。
+	* 描述：该配置项属于高级配置项，是用户自己定义切分配置信息，普通情况下不建议用户使用。适用场景通常在OTS数据存储发生热点，使用otsplusreader自动切分的策略不能生效情况下，使用用户自定义的切分规则。split指定是的在Begin、End区间内的切分点，且只能是partitionKey的切分点信息，即在split仅配置partitionKey，而不需要指定全部的PrimaryKey。
 
 		例如对一张主键为 [DeviceID, SellerID]的OTS进行抽取任务，可以配置为:
 
@@ -277,7 +277,7 @@ otspostprocessreader会根据OTS的表范围，按照Datax并发的数目N，将
 
 ### 3.3 类型转换
 
-目前otspostprocessreader支持所有OTS类型，下面列出otspostprocessreader针对OTS类型转换列表:
+目前otsplusreader支持所有OTS类型，下面列出otsplusreader针对OTS类型转换列表:
 
 
 | DataX 内部类型| OTS 数据类型    |
@@ -326,15 +326,15 @@ DataX运行端: 24核CPU， 98GB内存
 
 ### 5.1 一致性约束
 
-OTS是类BigTable的存储系统，OTS本身能够保证单行写事务性，无法提供跨行级别的事务。对于otspostprocessreader而言也无法提供全表的一致性视图。例如对于otspostprocessreader在0点启动的数据同步任务，在整个表数据同步过程中，otspostprocessreader同样会抽取到后续更新的数据，无法提供准确的0点时刻该表一致性视图。
+OTS是类BigTable的存储系统，OTS本身能够保证单行写事务性，无法提供跨行级别的事务。对于otsplusreader而言也无法提供全表的一致性视图。例如对于otsplusreader在0点启动的数据同步任务，在整个表数据同步过程中，otsplusreader同样会抽取到后续更新的数据，无法提供准确的0点时刻该表一致性视图。
 
 ### 5.2 增量数据同步
 
 OTS本质上KV存储，目前只能针对PK进行范围查询，暂不支持按照字段范围抽取数据。因此只能对于增量查询，如果PK能够表示范围信息，例如自增ID，或者时间戳。
 
-自增ID，otspostprocessreader可以通过记录上次最大的ID信息，通过指定Range范围进行增量抽取。这样使用的前提是OTS中的PrimaryKey必须包含主键自增列(自增主键需要使用OTS应用方生成。)
+自增ID，otsplusreader可以通过记录上次最大的ID信息，通过指定Range范围进行增量抽取。这样使用的前提是OTS中的PrimaryKey必须包含主键自增列(自增主键需要使用OTS应用方生成。)
 
-时间戳，	otspostprocessreader可以通过PK过滤时间戳，通过制定Range范围进行增量抽取。这样使用的前提是OTS中的PrimaryKey必须包含主键时间列(时间主键需要使用OTS应用方生成。)
+时间戳，	otsplusreader可以通过PK过滤时间戳，通过制定Range范围进行增量抽取。这样使用的前提是OTS中的PrimaryKey必须包含主键时间列(时间主键需要使用OTS应用方生成。)
 
 ## 6 FAQ
 

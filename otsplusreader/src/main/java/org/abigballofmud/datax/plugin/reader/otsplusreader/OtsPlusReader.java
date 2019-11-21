@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>otspostprocess reader</p>
+ * <p>otsplusreader</p>
  *
  * @author abigballofmud 2019-09-06 16:44:09
  */
