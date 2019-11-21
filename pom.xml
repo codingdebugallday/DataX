@@ -67,7 +67,6 @@
         <module>tsdbreader</module>
         <module>opentsdbreader</module>
         <module>cassandrareader</module>
-        <module>opentsdbreader</module>
 
         <!-- writer -->
         <module>mysqlwriter</module>
@@ -93,7 +92,6 @@
         <module>elasticsearchwriter</module>
         <module>tsdbwriter</module>
         <module>adbpgwriter</module>
-        <module>gdbwriter</module>
         <module>gdbwriter</module>
         <module>cassandrawriter</module>
 
