@@ -270,6 +270,26 @@ HdfsWriter提供向HDFS文件系统指定路径中写入TEXTFile文件和ORCFile
 
 	* 默认值：无 <br />
 
+* **dropImportDelims**
+
+	* 描述：是否删除字段中的\n, \r, and \01 <br />
+
+    * 注意：与delimsReplacement不能共存，两者选其一
+    
+	* 必选：否 <br />
+
+	* 默认值：false <br />
+
+* **delimsReplacement**
+
+	* 描述：替换字段中的\n, \r, and \01为配置的值 <br />
+
+    * 注意：与delimsReplacement不能共存，两者选其一
+    
+	* 必选：否 <br />
+
+	* 默认值：无 <br />
+
 * **compress**
 
 	* 描述：hdfs文件压缩类型，默认不填写意味着没有压缩。其中：text类型文件支持压缩类型有gzip、bzip2;orc类型文件支持的压缩类型有NONE、SNAPPY（需要用户安装SnappyCodec）。 <br />
