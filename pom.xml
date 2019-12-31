@@ -47,7 +47,7 @@
         <module>transformer</module>
 
         <!-- reader -->
-        <module>mysqlreader</module>
+        <!--<module>mysqlreader</module>
         <module>drdsreader</module>
         <module>sqlserverreader</module>
         <module>postgresqlreader</module>
@@ -66,10 +66,10 @@
         <module>hbase094xreader</module>
         <module>tsdbreader</module>
         <module>opentsdbreader</module>
-        <module>cassandrareader</module>
+        <module>cassandrareader</module>-->
 
         <!-- writer -->
-        <module>mysqlwriter</module>
+       <!-- <module>mysqlwriter</module>
         <module>drdswriter</module>
         <module>odpswriter</module>
         <module>txtfilewriter</module>
@@ -93,7 +93,7 @@
         <module>tsdbwriter</module>
         <module>adbpgwriter</module>
         <module>gdbwriter</module>
-        <module>cassandrawriter</module>
+        <module>cassandrawriter</module>-->
 
         <!-- common support module -->
         <module>plugin-rdbms-util</module>
@@ -103,6 +103,7 @@
 
         <!--自定义插件 reader-->
         <module>otsplusreader</module>
+        <module>hdfsplusreader</module>
 
         <!--自定义插件 writer-->
         <module>hdfspluswriter</module>

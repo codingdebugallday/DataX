@@ -1,0 +1,6 @@
+{
+    "name": "hdfsplusreader",
+    "class": "org.abigballofmud.datax.plugin.reader.hdfsplusreader.HdfsPlusReader",
+    "description": "useScene: test. mechanism: use datax framework to transport data from hdfs. warn: The more you know about the data, the less problems you encounter.",
+    "developer": "abigballofmud"
+}

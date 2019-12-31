@@ -1,0 +1,12 @@
+{
+  "name": "hdfsplusreader",
+  "parameter": {
+    "defaultFS": "hdfs://xxx:port",
+    "querySql": "select * from user",
+    "hadoopConfig": {
+    },
+    "haveKerberos": false,
+    "kerberosKeytabFilePath": "",
+    "kerberosPrincipal": ""
+  }
+}
