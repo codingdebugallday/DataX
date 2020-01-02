@@ -15,7 +15,7 @@
 
         在hdfswriter基础上，做了增强处理: 
         1. 增加preSql，postSql，跟mysqlWriter中的preSql，postSql一样
-        2. 增加delimsReplacement，dropImportDelims，对字段中的\n, \r, and \01处理，跟sqoop类似
+        2. 增加delimsReplacement，dropImportDelims，对字段中的\n、\r以及\01处理，跟sqoop一样
         
 
 # DataX
