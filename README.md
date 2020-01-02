@@ -6,6 +6,11 @@
 
         可以对ots的字段进行加密解密操作
 
+- ##### [hdfsplusreader](https://github.com/codingdebugallday/DataX/blob/master/hdfsplusreader/doc/hdfsplusreader.md)
+
+        由于hdfsreader插件是基于hdfs上的文件，不能自定义sql，因此开发了hdfsplusreader插件,
+        通过Shell执行自定义Hive查询SQL，写入临时表(ORC)，再将临时表数据给到DataX，最后删除。
+
 - ##### [hdfspluswriter](https://github.com/codingdebugallday/DataX/blob/master/hdfspluswriter/doc/hdfspluswriter.md)
 
         在hdfswriter基础上，做了增强处理: 
