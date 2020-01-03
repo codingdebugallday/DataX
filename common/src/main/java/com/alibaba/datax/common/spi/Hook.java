@@ -1,8 +1,9 @@
 package com.alibaba.datax.common.spi;
 
-import com.alibaba.datax.common.util.Configuration;
-
 import java.util.Map;
+
+import com.alibaba.datax.common.statistics.JobStatistics;
+import com.alibaba.datax.common.util.Configuration;
 
 /**
  * Created by xiafei.qiuxf on 14/12/17.
@@ -21,7 +22,8 @@ public interface Hook {
      *
      * @param jobConf
      * @param msg
+     * @param jobStatistics Datax job监控信息
      */
-    public void invoke(Configuration jobConf, Map<String, Number> msg);
+    void invoke(Configuration jobConf, Map<String, Number> msg, JobStatistics jobStatistics);
 
 }

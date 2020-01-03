@@ -5,7 +5,7 @@ package org.abigballofmud.datax.plugin.reader.otsplusreader.model;
  * switch在jdk6不支持string等，故采用枚举适配下
  * </p>
  *
- * @author isacc 2019/09/09 14:51
+ * @author abigballofmud 2019/09/09 14:51
  * @since 1.0
  */
 public enum SecretTypeEnum {

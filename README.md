@@ -17,6 +17,11 @@
         1. 增加preSql，postSql，跟mysqlWriter中的preSql，postSql一样
         2. 增加delimsReplacement，dropImportDelims，对字段中的\n、\r以及\01处理，跟sqoop一样
         
+**基于DataX自定义Hook，进行DataX job的监控信息处理：** 
+
+- ##### [DataX Hook](https://github.com/codingdebugallday/DataX/blob/master/all-hook/doc/README.md)
+
+        开发azkaban datax插件去调度datax任务，对datax监控信息进行存表操作
 
 # DataX
 

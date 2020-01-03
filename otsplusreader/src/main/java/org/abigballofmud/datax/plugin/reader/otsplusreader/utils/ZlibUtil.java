@@ -14,7 +14,7 @@ import org.abigballofmud.datax.plugin.reader.otsplusreader.OtsPlusReaderError;
  * description
  * </p>
  *
- * @author isacc 2019/09/09 10:23
+ * @author abigballofmud 2019/09/09 10:23
  * @since 1.0
  */
 public class ZlibUtil {

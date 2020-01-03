@@ -1,8 +1,15 @@
 package com.alibaba.datax.core;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.alibaba.datax.common.element.ColumnCast;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.ErrorCode;
+import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.statistics.VMInfo;
 import com.alibaba.datax.common.util.Configuration;
@@ -21,22 +28,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Engine是DataX入口类，该类负责初始化Job或者Task的运行容器，并运行插件的Job或者Task逻辑
  */
 public class Engine {
     private static final Logger LOG = LoggerFactory.getLogger(Engine.class);
 
+    private static final Pattern DATAX_JSON_FILE_NAME_REGEX = Pattern.compile("_temp_exec_json_[0-9]*_(.*?)$");
+    private static final Pattern DATAX_EXE_ID_REGEX = Pattern.compile("/executions/([0-9]*)/");
+
     private static String RUNTIME_MODE;
 
     /* check job model (job/task) first */
-    public void start(Configuration allConf) {
+    public void start(Configuration allConf, JobStatistics jobStatistics) {
 
         // 绑定column转换信息
         ColumnCast.bind(allConf);
@@ -49,13 +53,13 @@ public class Engine {
         boolean isJob = !("taskGroup".equalsIgnoreCase(allConf
                 .getString(CoreConstant.DATAX_CORE_CONTAINER_MODEL)));
         //JobContainer会在schedule后再行进行设置和调整值
-        int channelNumber =0;
+        int channelNumber = 0;
         AbstractContainer container;
         long instanceId;
         int taskGroupId = -1;
         if (isJob) {
             allConf.set(CoreConstant.DATAX_CORE_CONTAINER_JOB_MODE, RUNTIME_MODE);
-            container = new JobContainer(allConf);
+            container = new JobContainer(allConf, jobStatistics);
             instanceId = allConf.getLong(
                     CoreConstant.DATAX_CORE_CONTAINER_JOB_ID, 0);
 
@@ -74,21 +78,21 @@ public class Engine {
         boolean perfReportEnable = allConf.getBool(CoreConstant.DATAX_CORE_REPORT_DATAX_PERFLOG, true);
 
         //standlone模式的datax shell任务不进行汇报
-        if(instanceId == -1){
+        if (instanceId == -1) {
             perfReportEnable = false;
         }
 
         int priority = 0;
         try {
             priority = Integer.parseInt(System.getenv("SKYNET_PRIORITY"));
-        }catch (NumberFormatException e){
-            LOG.warn("prioriy set to 0, because NumberFormatException, the value is: "+System.getProperty("PROIORY"));
+        } catch (NumberFormatException e) {
+            LOG.warn("prioriy set to 0, because NumberFormatException, the value is: " + System.getProperty("PROIORY"));
         }
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
         //初始化PerfTrace
         PerfTrace perfTrace = PerfTrace.getInstance(isJob, instanceId, taskGroupId, priority, traceEnable);
-        perfTrace.setJobInfo(jobInfoConfig,perfReportEnable,channelNumber);
+        perfTrace.setJobInfo(jobInfoConfig, perfReportEnable, channelNumber);
         container.start();
 
     }
@@ -102,12 +106,12 @@ public class Engine {
 
         filterSensitiveConfiguration(jobContent);
 
-        jobConfWithSetting.set("content",jobContent);
+        jobConfWithSetting.set("content", jobContent);
 
         return jobConfWithSetting.beautify();
     }
 
-    public static Configuration filterSensitiveConfiguration(Configuration configuration){
+    public static Configuration filterSensitiveConfiguration(Configuration configuration) {
         Set<String> keys = configuration.getKeys();
         for (final String key : keys) {
             boolean isSensitive = StringUtils.endsWithIgnoreCase(key, "password")
@@ -168,14 +172,33 @@ public class Engine {
 
         ConfigurationValidate.doValidate(configuration);
         Engine engine = new Engine();
-        engine.start(configuration);
+        // 记录DataX job执行情况
+        JobStatistics jobStatistics = new JobStatistics();
+        jobStatistics.setJobPath(jobPath);
+        // 获取datax json 文件名称
+        Matcher jsonFileMatcher = DATAX_JSON_FILE_NAME_REGEX.matcher(jobPath);
+        if (jsonFileMatcher.find()) {
+            jobStatistics.setJsonFileName(jsonFileMatcher.group(1));
+        } else {
+            jobStatistics.setJsonFileName(jobPath);
+        }
+        // 获取datax azkaban调度时的exec_id
+        Matcher exeIdMatcher = DATAX_EXE_ID_REGEX.matcher(jobPath);
+        if (exeIdMatcher.find()) {
+            jobStatistics.setExecId(Long.valueOf(exeIdMatcher.group(1)));
+        } else {
+            jobStatistics.setExecId(-1L);
+        }
+        // 获取json信息
+        jobStatistics.setJobContent(Engine.filterJobConfiguration(configuration));
+        engine.start(configuration, jobStatistics);
     }
 
 
     /**
      * -1 表示未能解析到 jobId
-     *
-     *  only for dsc & ds & datax 3 update
+     * <p>
+     * only for dsc & ds & datax 3 update
      */
     private static long parseJobIdFromUrl(List<String> patternStringList, String url) {
         long result = -1;

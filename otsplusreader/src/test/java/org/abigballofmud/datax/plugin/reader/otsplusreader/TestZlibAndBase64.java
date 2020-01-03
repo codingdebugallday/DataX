@@ -15,7 +15,7 @@ import sun.misc.BASE64Decoder;
  * description
  * </p>
  *
- * @author isacc 2019/09/09 15:31
+ * @author abigballofmud 2019/09/09 15:31
  * @since 1.0
  */
 public class TestZlibAndBase64 {
