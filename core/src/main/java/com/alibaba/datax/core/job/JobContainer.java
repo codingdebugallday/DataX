@@ -10,6 +10,7 @@ import com.alibaba.datax.common.plugin.AbstractJobPlugin;
 import com.alibaba.datax.common.plugin.JobPluginCollector;
 import com.alibaba.datax.common.spi.Reader;
 import com.alibaba.datax.common.spi.Writer;
+import com.alibaba.datax.common.statistics.DirtyRecordContext;
 import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.statistics.VMInfo;
@@ -184,6 +185,7 @@ public class JobContainer extends AbstractContainer {
 
                     LOG.info(PerfTrace.getInstance().summarizeNoException());
                     this.logStatistics(jobStatistics);
+                    DirtyRecordContext.clear();
                     this.invokeHooks();
                 }
             }
@@ -622,6 +624,7 @@ public class JobContainer extends AbstractContainer {
         jobStatistics.setRecordSpeedPerSecond(recordSpeedPerSecond + "rec/s");
         jobStatistics.setTotalReadRecords(CommunicationTool.getTotalReadRecords(communication));
         jobStatistics.setTotalErrorRecords(CommunicationTool.getTotalErrorRecords(communication));
+        jobStatistics.setDirtyRecordList(DirtyRecordContext.current());
 
         LOG.info(String.format(
                 "\n" + "%-26s: %-18s\n" + "%-26s: %-18s\n" + "%-26s: %19s\n"

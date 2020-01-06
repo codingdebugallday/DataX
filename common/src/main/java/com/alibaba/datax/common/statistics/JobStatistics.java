@@ -1,5 +1,10 @@
 package com.alibaba.datax.common.statistics;
 
+import java.util.List;
+import java.util.Objects;
+
+import com.alibaba.datax.common.element.Record;
+
 /**
  * <p>
  * DataX任务信息统计
@@ -19,6 +24,10 @@ public class JobStatistics {
      * datax执行的json文件名
      */
     private String jsonFileName;
+    /**
+     * azkaban job名称
+     */
+    private String jobName;
     /**
      * azkaban执行ID
      */
@@ -63,6 +72,10 @@ public class JobStatistics {
      * 读写失败总数
      */
     private Long totalErrorRecords;
+    /**
+     * 脏数据集合
+     */
+    private List<Record> dirtyRecordList;
 
     public Long getId() {
         return id;
@@ -86,6 +99,14 @@ public class JobStatistics {
 
     public void setJsonFileName(String jsonFileName) {
         this.jsonFileName = jsonFileName;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 
     public Long getExecId() {
@@ -176,12 +197,22 @@ public class JobStatistics {
         this.totalErrorRecords = totalErrorRecords;
     }
 
+    public List<Record> getDirtyRecordList() {
+        return dirtyRecordList;
+    }
+
+    public void setDirtyRecordList(List<Record> dirtyRecordList) {
+        this.dirtyRecordList = dirtyRecordList;
+    }
+
+    // ", dirtyRecordList.size()=" + (Objects.isNull(dirtyRecordList) ? 0 : dirtyRecordList.size()) +
+
     @Override
     public String toString() {
         return "JobStatistics{" +
-                "id=" + id +
-                ", jobPath='" + jobPath + '\'' +
+                "jobPath='" + jobPath + '\'' +
                 ", jsonFileName='" + jsonFileName + '\'' +
+                ", jobName='" + jobName + '\'' +
                 ", execId=" + execId +
                 ", readerPlugin='" + readerPlugin + '\'' +
                 ", writerPlugin='" + writerPlugin + '\'' +
@@ -192,6 +223,7 @@ public class JobStatistics {
                 ", recordSpeedPerSecond='" + recordSpeedPerSecond + '\'' +
                 ", totalReadRecords=" + totalReadRecords +
                 ", totalErrorRecords=" + totalErrorRecords +
+                ", dirtyRecordList.size()=" + (Objects.isNull(dirtyRecordList) ? 0 : dirtyRecordList.size()) +
                 '}';
     }
 }

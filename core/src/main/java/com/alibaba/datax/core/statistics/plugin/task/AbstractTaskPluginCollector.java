@@ -1,14 +1,14 @@
 package com.alibaba.datax.core.statistics.plugin.task;
 
-import com.alibaba.datax.core.statistics.communication.Communication;
-import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.common.constant.PluginType;
 import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.TaskPluginCollector;
+import com.alibaba.datax.common.statistics.DirtyRecordContext;
 import com.alibaba.datax.common.util.Configuration;
+import com.alibaba.datax.core.statistics.communication.Communication;
+import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +52,11 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
     @Override
     public void collectDirtyRecord(Record dirtyRecord, Throwable t,
                                    String errorMessage) {
-
         if (null == dirtyRecord) {
             LOG.warn("脏数据record=null.");
             return;
         }
-
+        LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(dirtyRecord));
         if (this.pluginType.equals(PluginType.READER)) {
             this.communication.increaseCounter(
                     CommunicationTool.READ_FAILED_RECORDS, 1);

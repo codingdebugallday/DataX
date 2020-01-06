@@ -3,12 +3,14 @@ package com.alibaba.datax.core;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.alibaba.datax.common.element.ColumnCast;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.ErrorCode;
+import com.alibaba.datax.common.statistics.DirtyRecordContext;
 import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.statistics.PerfTrace;
 import com.alibaba.datax.common.statistics.VMInfo;
@@ -173,14 +175,19 @@ public class Engine {
         ConfigurationValidate.doValidate(configuration);
         Engine engine = new Engine();
         // 记录DataX job执行情况
+        DirtyRecordContext.setDirtyRecordList(new CopyOnWriteArrayList<>());
         JobStatistics jobStatistics = new JobStatistics();
         jobStatistics.setJobPath(jobPath);
-        // 获取datax json 文件名称
+        // 获取datax json 文件名称 job名称
         Matcher jsonFileMatcher = DATAX_JSON_FILE_NAME_REGEX.matcher(jobPath);
         if (jsonFileMatcher.find()) {
-            jobStatistics.setJsonFileName(jsonFileMatcher.group(1));
+            String jsonFileName = jsonFileMatcher.group(1);
+            jobStatistics.setJsonFileName(jsonFileName);
+            // %d_datax_%s
+            jobStatistics.setJobName(jsonFileName.substring(jsonFileName.indexOf("_datax_") + 1).replace(".json", ""));
         } else {
-            jobStatistics.setJsonFileName(jobPath);
+            jobStatistics.setJsonFileName(jobPath.substring(jobPath.lastIndexOf('/') + 1));
+            jobStatistics.setJobName(jobPath.substring(jobPath.lastIndexOf('/') + 1).replace(".json", ""));
         }
         // 获取datax azkaban调度时的exec_id
         Matcher exeIdMatcher = DATAX_EXE_ID_REGEX.matcher(jobPath);
