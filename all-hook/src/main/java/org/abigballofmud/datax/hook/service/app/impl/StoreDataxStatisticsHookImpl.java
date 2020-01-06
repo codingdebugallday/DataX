@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -71,66 +72,89 @@ public class StoreDataxStatisticsHookImpl implements Hook {
             LOG.info("columns: {}", columns);
             Triple<List<String>, List<Integer>, List<String>> columnMetaData =
                     DBUtil.getColumnMetaData(connection, tableName, columns);
-            String valueHolder = columnMetaData.getMiddle().stream().map(columnSqlType -> {
-                switch (columnSqlType) {
-                    case Types.CHAR:
-                    case Types.NCHAR:
-                    case Types.CLOB:
-                    case Types.NCLOB:
-                    case Types.VARCHAR:
-                    case Types.LONGVARCHAR:
-                    case Types.NVARCHAR:
-                    case Types.LONGNVARCHAR:
-                    case Types.DATE:
-                    case Types.TIME:
-                    case Types.TIMESTAMP:
-                    case Types.BINARY:
-                    case Types.VARBINARY:
-                    case Types.BLOB:
-                    case Types.LONGVARBINARY:
-                    case Types.BOOLEAN:
-                    case Types.BIT:
-                        return "'%s'";
-                    case Types.SMALLINT:
-                    case Types.INTEGER:
-                    case Types.BIGINT:
-                    case Types.NUMERIC:
-                    case Types.DECIMAL:
-                    case Types.FLOAT:
-                    case Types.REAL:
-                    case Types.DOUBLE:
-                    case Types.TINYINT:
-                        return "%d";
-                    default:
-                        throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "暂不支持该字段类型请修改表中该字段的类型.");
-                }
-            }).collect(Collectors.joining(", "));
-            LOG.info("valueHolder: {}", valueHolder);
-            String sql = String.format("INSERT INTO %s(%s) VALUES (%s)",
-                    tableName,
-                    columns,
-                    String.format(valueHolder, jobStatistics.getExecId(),
-                            jobStatistics.getJsonFileName(),
-                            jobStatistics.getJobName(),
-                            jobStatistics.getReaderPlugin(),
-                            jobStatistics.getWriterPlugin(),
-                            jobStatistics.getStartTime(),
-                            jobStatistics.getEndTime(),
-                            jobStatistics.getTotalCosts(),
-                            jobStatistics.getByteSpeedPerSecond(),
-                            jobStatistics.getRecordSpeedPerSecond(),
-                            jobStatistics.getTotalReadRecords(),
-                            jobStatistics.getTotalErrorRecords(),
-                            jobStatistics.getJobPath(),
-                            jobStatistics.getJobContent(),
-                            jobStatistics.getDirtyRecordList().isEmpty() ? null : String.format("%s", jobStatistics.getDirtyRecordList()))
-            );
-            LOG.info("sql: {}", sql);
+            List<String> valueHolderList = genValueHolderList(columnMetaData);
+            String sql = genSql(valueHolderList, jobStatistics, tableName, columns);
+            LOG.debug("sql: {}", sql);
             DBUtil.executeSqlWithoutResultSet(statement, sql);
             LOG.info("jobStatistics insert into table success");
         } catch (SQLException e) {
             LOG.error("store to db error", e);
         }
+    }
+
+    private List<String> genValueHolderList(Triple<List<String>, List<Integer>, List<String>> columnMetaData) {
+        List<String> valueHolderList = new ArrayList<>(columnMetaData.getLeft().size());
+        for (int i = 0; i < columnMetaData.getLeft().size(); i++) {
+            switch (columnMetaData.getMiddle().get(i)) {
+                case Types.CHAR:
+                case Types.NCHAR:
+                case Types.CLOB:
+                case Types.NCLOB:
+                case Types.VARCHAR:
+                case Types.LONGVARCHAR:
+                case Types.NVARCHAR:
+                case Types.LONGNVARCHAR:
+                case Types.DATE:
+                case Types.TIME:
+                case Types.TIMESTAMP:
+                case Types.BINARY:
+                case Types.VARBINARY:
+                case Types.BLOB:
+                case Types.LONGVARBINARY:
+                case Types.BOOLEAN:
+                case Types.BIT:
+                    if (columnMetaData.getLeft().get(i).contains("dirty_records")) {
+                        valueHolderList.add("%s");
+                    } else {
+                        valueHolderList.add("'%s'");
+                    }
+                    break;
+                case Types.SMALLINT:
+                case Types.INTEGER:
+                case Types.BIGINT:
+                case Types.NUMERIC:
+                case Types.DECIMAL:
+                case Types.FLOAT:
+                case Types.REAL:
+                case Types.DOUBLE:
+                case Types.TINYINT:
+                    valueHolderList.add("%d");
+                    break;
+                default:
+                    throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "暂不支持该字段类型请修改表中该字段的类型.");
+            }
+        }
+        return valueHolderList;
+    }
+
+    private String genSql(List<String> valueHolderList, JobStatistics jobStatistics, String tableName, String columns) {
+        String dirtyRecord;
+        if (!jobStatistics.getDirtyRecordList().isEmpty()) {
+            // 暂时这样
+            dirtyRecord = String.format("'%s'", jobStatistics.getDirtyRecordList());
+        } else {
+            dirtyRecord = null;
+        }
+        return String.format("INSERT INTO %s(%s) VALUES (%s)",
+                tableName,
+                columns,
+                String.format(String.join(", ", valueHolderList), jobStatistics.getExecId(),
+                        jobStatistics.getJsonFileName(),
+                        jobStatistics.getJobName(),
+                        jobStatistics.getReaderPlugin(),
+                        jobStatistics.getWriterPlugin(),
+                        jobStatistics.getStartTime(),
+                        jobStatistics.getEndTime(),
+                        jobStatistics.getTotalCosts(),
+                        jobStatistics.getByteSpeedPerSecond(),
+                        jobStatistics.getRecordSpeedPerSecond(),
+                        jobStatistics.getTotalReadRecords(),
+                        jobStatistics.getTotalErrorRecords(),
+                        jobStatistics.getJobPath(),
+                        jobStatistics.getJobContent(),
+                        dirtyRecord
+                )
+        );
     }
 
 }
