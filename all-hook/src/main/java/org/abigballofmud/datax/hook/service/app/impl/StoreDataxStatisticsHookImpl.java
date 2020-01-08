@@ -15,14 +15,11 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import com.alibaba.datax.common.element.Column;
-import com.alibaba.datax.common.element.LongColumn;
 import com.alibaba.datax.common.element.Record;
-import com.alibaba.datax.common.element.StringColumn;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.Hook;
 import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.core.transport.record.DefaultRecord;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
@@ -145,7 +142,7 @@ public class StoreDataxStatisticsHookImpl implements Hook {
             Map<String, Object> tmp;
             for (Pair<Record, String> pair : dirtyRecordList) {
                 map = Maps.newHashMapWithExpectedSize(dirtyRecordList.size());
-                map.put("errorMessage", pair.getRight());
+                map.put("errorMessage", pair.getRight().replace("'", "\\\""));
                 List<Column> columnList = pair.getLeft().getColumnList();
                 for (int i = 0, size = columnList.size(); i < size; i++) {
                     tmp = Maps.newHashMapWithExpectedSize(size);
