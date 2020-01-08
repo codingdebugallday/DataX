@@ -13,12 +13,12 @@
             <includes>
                 <include>plugin.json</include>
             </includes>
-            <outputDirectory>plugin/writer/elasticsearcplushwriter</outputDirectory>
+            <outputDirectory>plugin/writer/elasticsearchpluswriter</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>target/</directory>
             <includes>
-                <include>elasticsearcplushwriter-0.0.1-SNAPSHOT.jar</include>
+                <include>elasticsearchpluswriter-0.0.1-SNAPSHOT.jar</include>
             </includes>
             <outputDirectory>plugin/writer/elasticsearchpluswriter</outputDirectory>
         </fileSet>
