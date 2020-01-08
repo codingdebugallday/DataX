@@ -1,9 +1,11 @@
 package com.alibaba.datax.common.statistics;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import com.alibaba.datax.common.element.Record;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * <p>
@@ -75,7 +77,7 @@ public class JobStatistics {
     /**
      * 脏数据集合
      */
-    private List<Record> dirtyRecordList;
+    private List<Pair<Record, String>> dirtyRecordList;
 
     public Long getId() {
         return id;
@@ -197,11 +199,11 @@ public class JobStatistics {
         this.totalErrorRecords = totalErrorRecords;
     }
 
-    public List<Record> getDirtyRecordList() {
+    public List<Pair<Record, String>> getDirtyRecordList() {
         return dirtyRecordList;
     }
 
-    public void setDirtyRecordList(List<Record> dirtyRecordList) {
+    public void setDirtyRecordList(List<Pair<Record, String>> dirtyRecordList) {
         this.dirtyRecordList = dirtyRecordList;
     }
 

@@ -65,6 +65,11 @@ public class DirtyRecord implements Record {
 				"该方法不支持!");
 	}
 
+	@Override
+	public List<Column> getColumnList() {
+		return this.columns;
+	}
+
 	public List<Column> getColumns() {
 		return columns;
 	}
