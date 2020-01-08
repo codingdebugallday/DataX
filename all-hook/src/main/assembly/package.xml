@@ -22,6 +22,14 @@
 			</includes>
 			<outputDirectory>hook/abigballofmud</outputDirectory>
 		</fileSet>
+		<!-- for configs -->
+		<fileSet>
+			<directory>src/main/conf</directory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<outputDirectory>/conf</outputDirectory>
+		</fileSet>
 	</fileSets>
 
 	<dependencySets>

@@ -83,6 +83,11 @@ public class DefaultRecord implements Record {
 		return memorySize;
 	}
 
+	@Override
+	public List<Column> getColumnList() {
+		return this.columns;
+	}
+
 	private void decrByteSize(final Column column) {
 		if (null == column) {
 			return;

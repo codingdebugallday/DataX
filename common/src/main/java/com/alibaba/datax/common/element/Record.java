@@ -1,5 +1,7 @@
 package com.alibaba.datax.common.element;
 
+import java.util.List;
+
 /**
  * Created by jingxing on 14-8-24.
  */
@@ -19,5 +21,7 @@ public interface Record {
 	public int getByteSize();
 
 	public int getMemorySize();
+
+	List<Column> getColumnList();
 
 }

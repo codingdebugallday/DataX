@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.alibaba.datax.common.element.Record;
 import com.alibaba.ttl.TransmittableThreadLocal;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * <p>
@@ -19,15 +20,15 @@ public class DirtyRecordContext {
         throw new IllegalStateException("context class!");
     }
 
-    private static final TransmittableThreadLocal<List<Record>> DIRTY_RECORD_LIST_THREAD_LOCAL =
+    private static final TransmittableThreadLocal<List<Pair<Record, String>>> DIRTY_RECORD_LIST_THREAD_LOCAL =
             new TransmittableThreadLocal<>();
 
 
-    public static List<Record> current() {
+    public static List<Pair<Record, String>> current() {
         return DIRTY_RECORD_LIST_THREAD_LOCAL.get();
     }
 
-    public static void setDirtyRecordList(List<Record> dirtyRecordList) {
+    public static void setDirtyRecordList(List<Pair<Record, String>> dirtyRecordList) {
         DIRTY_RECORD_LIST_THREAD_LOCAL.set(dirtyRecordList);
     }
 

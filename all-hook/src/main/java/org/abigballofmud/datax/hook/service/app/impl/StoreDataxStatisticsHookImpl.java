@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.Hook;
 import com.alibaba.datax.common.statistics.JobStatistics;
@@ -22,6 +24,9 @@ import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
+import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,9 +134,26 @@ public class StoreDataxStatisticsHookImpl implements Hook {
 
     private String genSql(List<String> valueHolderList, JobStatistics jobStatistics, String tableName, String columns) {
         String dirtyRecord;
-        if (!jobStatistics.getDirtyRecordList().isEmpty()) {
+        List<Pair<Record, String>> dirtyRecordList = jobStatistics.getDirtyRecordList();
+        if (!dirtyRecordList.isEmpty()) {
             // 暂时这样
-            dirtyRecord = String.format("'%s'", jobStatistics.getDirtyRecordList());
+            List<Map<String, Object>> list = new ArrayList<>(dirtyRecordList.size());
+            Map<String, Object> map;
+            Map<String, Object> tmp;
+            for (Pair<Record, String> pair : dirtyRecordList) {
+                map = Maps.newHashMapWithExpectedSize(dirtyRecordList.size());
+                map.put("errorMessage", pair.getRight().replace("'", "\\\""));
+                List<Column> columnList = pair.getLeft().getColumnList();
+                for (int i = 0, size = columnList.size(); i < size; i++) {
+                    tmp = Maps.newHashMapWithExpectedSize(size);
+                    tmp.put("rowData", columnList.get(i).getRawData());
+                    tmp.put("byteSize", columnList.get(i).getByteSize());
+                    tmp.put("type", columnList.get(i).getType());
+                    map.put("col" + i, tmp);
+                }
+                list.add(map);
+            }
+            dirtyRecord = String.format("'%s'", JSON.toJSONString(list));
         } else {
             dirtyRecord = null;
         }
