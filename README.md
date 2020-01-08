@@ -21,7 +21,8 @@
 
 - ##### [DataX Hook](https://github.com/codingdebugallday/DataX/blob/master/all-hook/README.md)
 
-        开发azkaban datax插件去调度datax任务，对datax监控信息，如同步的日志有用信息提取以及数据一致性（脏数据收集），进行存表操作
+        开发azkaban datax插件去调度datax任务，对datax监控信息，
+        如同步的日志有用信息提取以及数据一致性（脏数据收集），进行存表操作
 
 # DataX
 
