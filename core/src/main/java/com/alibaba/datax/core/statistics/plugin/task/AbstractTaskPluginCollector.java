@@ -9,6 +9,7 @@ import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.core.statistics.communication.Communication;
 import com.alibaba.datax.core.statistics.communication.CommunicationTool;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,11 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
             LOG.warn("脏数据record=null.");
             return;
         }
-        LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, errorMessage)));
+        if (StringUtils.isNotBlank(errorMessage)) {
+            LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, errorMessage)));
+        } else if (null != t && StringUtils.isNotBlank(t.getMessage())) {
+            LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, t.getMessage())));
+        }
         if (this.pluginType.equals(PluginType.READER)) {
             this.communication.increaseCounter(
                     CommunicationTool.READ_FAILED_RECORDS, 1);
