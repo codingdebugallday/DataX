@@ -383,6 +383,14 @@
             <outputDirectory>datax</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>elasticsearchpluswriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
+
         <!--自定义hook-->
         <fileSet>
             <directory>all-hook/target/datax/</directory>
