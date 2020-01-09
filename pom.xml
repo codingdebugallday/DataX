@@ -107,6 +107,7 @@
 
         <!--自定义插件 writer-->
         <module>hdfspluswriter</module>
+        <module>elasticsearchpluswriter</module>
 
         <!--自定义datax hook-->
         <module>all-hook</module>

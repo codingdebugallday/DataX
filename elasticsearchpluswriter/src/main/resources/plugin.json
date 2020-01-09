@@ -1,0 +1,6 @@
+{
+    "name": "elasticsearchpluswriter",
+    "class": "com.alibaba.datax.plugin.writer.elasticsearchpluswriter.ESWriter",
+    "description": "适用于: 生产环境. ES6.X  原理: TODO",
+    "developer": "alibaba,terry"
+}

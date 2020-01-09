@@ -16,6 +16,11 @@
         在hdfswriter基础上，做了增强处理: 
         1. 增加preSql，postSql，跟mysqlWriter中的preSql，postSql一样
         2. 增加delimsReplacement，dropImportDelims，对字段中的\n、\r以及\01处理，跟sqoop一样
+
+- ##### [elasticsearchpluswriter](https://github.com/codingdebugallday/DataX/blob/master/elasticsearchpluswriter/doc/elasticsearchpluswriter.md)
+        
+        在elasticsearchwriter基础上，做了增强处理: 
+        1. 增加清空目标索引数据的功能
         
 **基于DataX自定义Hook，进行DataX job的监控以及数据一致性保证：** 
 
