@@ -10,6 +10,7 @@ import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.client.config.HttpClientConfig.Builder;
+import io.searchbox.cluster.TasksInformation;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.DeleteByQuery;
 import io.searchbox.indices.CreateIndex;
@@ -40,12 +41,12 @@ public class ESClient {
     }
 
     public void createClient(String endpoint,
-                                   String user,
-                                   String passwd,
-                                   boolean multiThread,
-                                   int readTimeout,
-                                   boolean compression,
-                                   boolean discovery) {
+                             String user,
+                             String passwd,
+                             boolean multiThread,
+                             int readTimeout,
+                             boolean compression,
+                             boolean discovery) {
 
         JestClientFactory factory = new JestClientFactory();
         Builder httpClientConfig = new HttpClientConfig
@@ -132,7 +133,7 @@ public class ESClient {
                 break;
             }
             Thread.sleep(2000);
-            idx ++;
+            idx++;
         }
         if (idx >= 5) {
             return false;
@@ -189,8 +190,8 @@ public class ESClient {
         List<AliasMapping> list = new ArrayList<AliasMapping>();
         if (rst.isSucceeded()) {
             JsonParser jp = new JsonParser();
-            JsonObject jo = (JsonObject)jp.parse(rst.getJsonString());
-            for(Map.Entry<String, JsonElement> entry : jo.entrySet()){
+            JsonObject jo = (JsonObject) jp.parse(rst.getJsonString());
+            for (Map.Entry<String, JsonElement> entry : jo.entrySet()) {
                 String tindex = entry.getKey();
                 if (indexname.equals(tindex)) {
                     continue;
@@ -227,7 +228,6 @@ public class ESClient {
 
     /**
      * 关闭JestClient客户端
-     *
      */
     public void closeJestClient() {
         if (jestClient != null) {
@@ -237,10 +237,15 @@ public class ESClient {
 
     /**
      * 删除索引数据
-     * @param indexName
-     * @return
+     *
+     * @param indexName   索引名
+     * @param type        文档类型
+     * @param readTimeout 超时时间
+     * @return boolean
+     * @throws Exception 异常
+     * @author terry
      */
-    public boolean deleteIndexData(String indexName, String type) throws Exception {
+    public boolean deleteIndexData(String indexName, String type, int readTimeout) throws Exception {
         log.info("delete index data" + indexName);
         final String deleteQuery = "{\n" +
                 "    \"query\": {\n" +
@@ -248,10 +253,41 @@ public class ESClient {
                 "    }\n" +
                 "}";
         if (indicesExists(indexName)) {
-            JestResult rst = execute(new DeleteByQuery.Builder(deleteQuery).addIndex(indexName).addType(type).build());
+            //  异步等待结果，直接返回任务id
+            JestResult rst = execute(new DeleteByQuery.Builder(deleteQuery).addIndex(indexName).addType(type)
+                    .setParameter("wait_for_completion", "false").build());
             if (!rst.isSucceeded()) {
                 return false;
             }
+            String task = rst.getJsonObject().get("task").getAsString();
+            log.info(String.format("task: %s", task));
+            // 查询任务执行情况
+            JestResult taskResult = jestClient.execute(new TasksInformation.Builder().task(task).build());
+            if (!taskResult.isSucceeded()) {
+                log.warn(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+            }
+
+            String status;
+            int count = 0;
+            int step = 2000;
+            while (!taskResult.getJsonObject().get("completed").getAsBoolean() && count * step < readTimeout) {
+                Thread.sleep(2000);
+                count++;
+                taskResult = jestClient.execute(new TasksInformation.Builder().task(task).build());
+                if (!taskResult.isSucceeded()) {
+                    log.warn(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+                }
+                status = taskResult.getJsonObject().get("task").getAsJsonObject().get("status").getAsJsonObject().toString();
+                if (count % 5 == 0) {
+                    //10秒打印一次
+                    log.info("status：" + status);
+                }
+            }
+            if (count * step >= readTimeout) {
+                log.error("Delete index data time out");
+                return false;
+            }
+            return true;
         } else {
             log.info("index cannot found, skip delete data" + indexName);
         }

@@ -43,6 +43,9 @@ public class ESWriter extends Writer {
 
         @Override
         public void prepare() {
+
+            int readTimeout = Key.getTimeout(conf);
+
             /**
              * 注意：此方法仅执行一次。
              * 最佳实践：如果 Job 中有需要进行数据同步之前的处理，可以在此处完成，如果没有必要则可以直接去掉。
@@ -52,7 +55,7 @@ public class ESWriter extends Writer {
                     Key.getAccessID(conf),
                     Key.getAccessKey(conf),
                     false,
-                    300000,
+                    readTimeout,
                     false,
                     false);
 
@@ -70,7 +73,7 @@ public class ESWriter extends Writer {
                 if (Key.isCleanup(this.conf) && isIndicesExists) {
                     esClient.deleteIndex(indexName);
                 } else if (Key.isCleanData(this.conf) && isIndicesExists) {
-                    if (!esClient.deleteIndexData(indexName, typeName)) {
+                    if (!esClient.deleteIndexData(indexName, typeName, readTimeout)) {
                         throw new IOException("delete index data failed");
                     }
                 }
