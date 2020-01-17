@@ -1,5 +1,7 @@
 package com.alibaba.datax.plugin.writer.elasticsearchpluswriter;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,21 +13,20 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.client.config.HttpClientConfig.Builder;
 import io.searchbox.cluster.TasksInformation;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.DeleteByQuery;
+import io.searchbox.core.*;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.aliases.*;
+import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.indices.settings.GetSettings;
 import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,6 +36,8 @@ public class ESClient {
     private static final Logger log = LoggerFactory.getLogger(ESClient.class);
 
     private JestClient jestClient;
+
+    private static final List<String> SETTING_PROPERTIES = Arrays.asList("number_of_shards", "number_of_replicas", "analysis");
 
     public JestClient getClient() {
         return jestClient;
@@ -136,6 +139,7 @@ public class ESClient {
             idx++;
         }
         if (idx >= 5) {
+            log.error("index create timeout");
             return false;
         }
 
@@ -247,15 +251,17 @@ public class ESClient {
      */
     public boolean deleteIndexData(String indexName, String type, int readTimeout) throws Exception {
         log.info("delete index data" + indexName);
-        final String deleteQuery = "{\n" +
-                "    \"query\": {\n" +
-                "        \"match_all\": {}\n" +
-                "    }\n" +
-                "}";
         if (indicesExists(indexName)) {
+            final String deleteQuery = "{\n" +
+                    "    \"query\": {\n" +
+                    "        \"match_all\": {}\n" +
+                    "    }\n" +
+                    "}";
             //  异步等待结果，直接返回任务id
             JestResult rst = execute(new DeleteByQuery.Builder(deleteQuery).addIndex(indexName).addType(type)
-                    .setParameter("wait_for_completion", "false").build());
+                    .setParameter("wait_for_completion", "false")
+                    .setParameter("slices", "auto") // 并发删除,自动设置分片
+                    .build());
             if (!rst.isSucceeded()) {
                 return false;
             }
@@ -264,33 +270,71 @@ public class ESClient {
             // 查询任务执行情况
             JestResult taskResult = jestClient.execute(new TasksInformation.Builder().task(task).build());
             if (!taskResult.isSucceeded()) {
-                log.warn(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+                log.error(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+                return false;
             }
 
             String status;
             int count = 0;
             int step = 2000;
-            while (!taskResult.getJsonObject().get("completed").getAsBoolean() && count * step < readTimeout) {
-                Thread.sleep(2000);
+            while (!taskResult.getJsonObject().get("completed").getAsBoolean()/* && count * step < readTimeout*/) {
+                Thread.sleep(step);
                 count++;
                 taskResult = jestClient.execute(new TasksInformation.Builder().task(task).build());
                 if (!taskResult.isSucceeded()) {
-                    log.warn(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+                    log.error(String.format("get TasksInformation error: %s", taskResult.getErrorMessage()));
+                    return false;
                 }
-                status = taskResult.getJsonObject().get("task").getAsJsonObject().get("status").getAsJsonObject().toString();
+                //status = taskResult.getJsonObject().get("task").getAsJsonObject().get("status").getAsJsonObject().toString();
                 if (count % 5 == 0) {
                     //10秒打印一次
-                    log.info("status：" + status);
+                    //log.info("status：" + status);
+                    CountResult countResult = jestClient.execute(new Count.Builder().addIndex(indexName).addType(type).build());
+                    if(countResult.isSucceeded()) {
+                        log.info(String.format("total %d record left", countResult.getCount().intValue()));
+                    }
                 }
             }
             if (count * step >= readTimeout) {
-                log.error("Delete index data time out");
-                return false;
+                log.warn("delete index data time out");
+                // return false;
             }
             return true;
         } else {
             log.info("index cannot found, skip delete data" + indexName);
         }
         return true;
+    }
+
+    public String getMappings(String indexName) throws Exception {
+        if (indicesExists(indexName)) {
+            JestResult mapping = jestClient.execute(new GetMapping.Builder().addIndex(indexName).build());
+            return mapping.getJsonObject().get(indexName).getAsJsonObject().get("mappings").toString();
+        } else {
+            throw new IOException(String.format("index [%s] not exits",indexName));
+        }
+    }
+
+    /**
+     * 获取索引的setting，SETTING_PROPERTIES中的属性
+     * @param indexName
+     * @return
+     * @throws Exception
+     */
+    public String getSettings(String indexName) throws Exception {
+        if (indicesExists(indexName)) {
+            JestResult setting = jestClient.execute(new GetSettings.Builder().addIndex(indexName).build());
+            JsonObject settingObject = setting.getJsonObject().get(indexName).getAsJsonObject().get("settings").getAsJsonObject().get("index").getAsJsonObject();
+            Map<String, Object> newSetting = new HashMap<>();
+            JSON.parseObject(settingObject.toString(), Map.class).forEach((k, v) -> {
+                String key = (String) k;
+                if (SETTING_PROPERTIES.contains(key)) {
+                    newSetting.put(key, v);
+                }
+            });
+            return JSONObject.toJSONString(newSetting);
+        } else {
+            throw new IOException(String.format("index [%s] not exits",indexName));
+        }
     }
 }

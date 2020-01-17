@@ -71,6 +71,10 @@ public class ESWriter extends Writer {
             try {
                 boolean isIndicesExists = esClient.indicesExists(indexName);
                 if (Key.isCleanup(this.conf) && isIndicesExists) {
+                    mappings =  esClient.getMappings(indexName);
+                    if(Key.getSettings(conf).isEmpty()) {
+                        settings = esClient.getSettings(indexName);
+                    }
                     esClient.deleteIndex(indexName);
                 } else if (Key.isCleanData(this.conf) && isIndicesExists) {
                     if (!esClient.deleteIndexData(indexName, typeName, readTimeout)) {

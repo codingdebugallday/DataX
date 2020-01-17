@@ -169,7 +169,10 @@
  * 必选: 否
  * 默认值: false
 
-
+* cleanData
+ * 描述: 清空目标索引文档数据，仅当cleanup=false时生效
+ * 必选: 否
+ * 默认值: false
 
 ## 4 性能报告
 
