@@ -59,9 +59,9 @@ public abstract class AbstractTaskPluginCollector extends TaskPluginCollector {
             return;
         }
         if (StringUtils.isNotBlank(errorMessage)) {
-            LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, errorMessage)));
+            LOG.debug("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, errorMessage)));
         } else if (null != t && StringUtils.isNotBlank(t.getMessage())) {
-            LOG.info("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, t.getMessage())));
+            LOG.debug("add dirtyRecord {}", DirtyRecordContext.current().add(Pair.of(dirtyRecord, t.getMessage())));
         }
         if (this.pluginType.equals(PluginType.READER)) {
             this.communication.increaseCounter(
