@@ -340,15 +340,17 @@ public class HdfsPlusReader extends Reader {
         @Override
         public void post() {
             LOG.info("post() begin...");
-            String hiveCmd = "drop table " + tmpTableName;
-            LOG.info("post() hive cmd: {}", hiveCmd);
-            // 执行脚本，删除临时表
-            try {
-                if (!ShellUtil.exec(new String[]{"hive", "-e", DOUBLE_QUOTATION + hiveCmd + DOUBLE_QUOTATION})) {
-                    throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "删除hive临时表脚本执行失败");
+            if (!StringUtils.isBlank(querySql)) {
+                String hiveCmd = "drop table " + tmpTableName;
+                LOG.info("post() hive cmd: {}", hiveCmd);
+                // 执行脚本，删除临时表
+                try {
+                    if (!ShellUtil.exec(new String[]{"hive", "-e", DOUBLE_QUOTATION + hiveCmd + DOUBLE_QUOTATION})) {
+                        throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "删除hive临时表脚本执行失败");
+                    }
+                } catch (Exception e) {
+                    throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "删除hive临时表脚本执行失败", e);
                 }
-            } catch (Exception e) {
-                throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "删除hive临时表脚本执行失败", e);
             }
             LOG.info("post() end...");
         }
