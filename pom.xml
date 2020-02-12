@@ -111,6 +111,10 @@
         <!--自定义datax hook-->
         <module>all-hook</module>
 
+        <!--clickhouse-->
+        <module>clickhousereader</module>
+        <module>clickhousewriter</module>
+
     </modules>
 
     <dependencyManagement>

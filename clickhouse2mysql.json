@@ -1,0 +1,43 @@
+{
+    "job": {
+        "content": [
+            {
+                "reader": {
+                    "name": "clickhousereader", 
+                    "parameter": {
+                        "column": ["id","name"], 
+                        "connection": [
+                            {
+                                "jdbcUrl": ["jdbc:clickhouse://192.168.17.192:8123/default"], 
+                                "table": ["t1"]
+                            }
+                        ], 
+                        "password": "", 
+                        "username": "",
+                        "where": "id > 1600"
+                    }
+                }, 
+                "writer": {
+                    "name": "mysqlwriter", 
+                    "parameter": {
+                        "column": ["id","name"], 
+                        "connection": [
+                            {
+                                "jdbcUrl": "jdbc:mysql://172.16.181.130:3306/test", 
+                                "table": ["t1"]
+                            }
+                        ], 
+                        "password": "root", 
+                        "username": "root", 
+                        "writeMode": "insert"
+                    }
+                }
+            }
+        ], 
+        "setting": {
+            "speed": {
+                "channel": "1"
+            }
+        }
+    }
+}
