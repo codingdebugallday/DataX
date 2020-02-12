@@ -284,16 +284,18 @@ public class HdfsPlusReader extends Reader {
         @Override
         public void prepare() {
             LOG.info("prepare() begin...");
-            String hiveCmd = "CREATE TABLE " + tmpTableName + " STORED AS ORC LOCATION '" + tmpPath + "' AS " + querySql;
-            LOG.info("prepare() hive cmd: {}", hiveCmd);
-            try {
-                if (!ShellUtil.exec(new String[]{"hive", "-e", DOUBLE_QUOTATION + hiveCmd + DOUBLE_QUOTATION})) {
-                    throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "创建hive临时表脚本执行失败");
+            if (!StringUtils.isBlank(querySql)) {
+                String hiveCmd = "CREATE TABLE " + tmpTableName + " STORED AS ORC LOCATION '" + tmpPath + "' AS " + querySql;
+                LOG.info("prepare() hive cmd: {}", hiveCmd);
+                try {
+                    if (!ShellUtil.exec(new String[]{"hive", "-e", DOUBLE_QUOTATION + hiveCmd + DOUBLE_QUOTATION})) {
+                        throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "创建hive临时表脚本执行失败");
+                    }
+                } catch (Exception e) {
+                    throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "创建hive临时表脚本执行失败", e);
                 }
-            } catch (Exception e) {
-                throw DataXException.asDataXException(HdfsPlusReaderErrorCode.SHELL_ERROR, "创建hive临时表脚本执行失败", e);
+                this.sourceTempFiles = dfsUtil.getAllFiles(Collections.singletonList(tmpPath), Constant.ORC);
             }
-            this.sourceTempFiles = dfsUtil.getAllFiles(Collections.singletonList(tmpPath), Constant.ORC);
             LOG.info("prepare() end...");
         }
 
