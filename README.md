@@ -57,9 +57,3 @@ DataX本身作为数据同步框架，将不同数据源的同步抽象为从源
 # 我要开发新的插件
 请点击：[DataX插件开发宝典](https://github.com/alibaba/DataX/blob/master/dataxPluginDev.md)
 
-# License
-
-This software is free to use under the Apache License [Apache license](https://github.com/alibaba/DataX/blob/master/license.txt).
-
-# 
-请及时提出issue给我们。请前往：[DataxIssue](https://github.com/alibaba/DataX/issues)
