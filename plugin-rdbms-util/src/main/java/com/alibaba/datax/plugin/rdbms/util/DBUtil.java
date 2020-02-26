@@ -793,6 +793,7 @@ public final class DBUtil {
                     String.class);
             for (String driver : drivers) {
                 Class.forName(driver);
+                LOG.info("load driver:" + driver);
             }
         } catch (ClassNotFoundException e) {
             throw DataXException.asDataXException(DBUtilErrorCode.CONF_ERROR,
