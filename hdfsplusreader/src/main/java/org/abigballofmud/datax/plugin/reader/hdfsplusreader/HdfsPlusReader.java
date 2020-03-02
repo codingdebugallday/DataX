@@ -56,7 +56,7 @@ public class HdfsPlusReader extends Reader {
                     HdfsPlusReaderErrorCode.DEFAULT_FS_NOT_FIND_ERROR);
             // 判断是hdfs文件模式还是querySql模式
             querySql = this.readerOriginConfig.getString(Key.QUERY_SQL);
-            if (StringUtils.isBlank(querySql)) {
+            if (StringUtils.isEmpty(querySql)) {
                 // path check
                 String pathInString = this.readerOriginConfig.getNecessaryValue(Key.PATH, HdfsPlusReaderErrorCode.REQUIRED_VALUE);
                 if (!pathInString.startsWith("[") && !pathInString.endsWith("]")) {
@@ -170,7 +170,7 @@ public class HdfsPlusReader extends Reader {
             if (dfsUtil.isExist(Key.TMP_PATH_PREFIX)) {
                 dfsUtil.mkdir(Key.TMP_PATH_PREFIX);
             }
-            if (StringUtils.isBlank(querySql)) {
+            if (StringUtils.isEmpty(querySql)) {
                 LOG.info("prepare(), start to getAllFiles...");
                 this.sourceFiles = dfsUtil.getAllFiles(path, specifiedFileType);
                 LOG.info(String.format("您即将读取的文件数为: [%s], 列表为: [%s]",
@@ -182,7 +182,7 @@ public class HdfsPlusReader extends Reader {
         @Override
         public List<Configuration> split(int adviceNumber) {
             List<Configuration> readerSplitConfigs;
-            if (StringUtils.isBlank(querySql)) {
+            if (StringUtils.isEmpty(querySql)) {
                 LOG.info("split() begin...");
                 readerSplitConfigs = new ArrayList<>();
                 // warn:每个slice拖且仅拖一个文件,
@@ -258,7 +258,7 @@ public class HdfsPlusReader extends Reader {
             LOG.info("init() begin...");
             this.taskConfig = super.getPluginJobConf();
             this.querySql = taskConfig.getString(Key.QUERY_SQL);
-            if (StringUtils.isBlank(this.querySql)) {
+            if (StringUtils.isEmpty(this.querySql)) {
                 this.sourceFiles = this.taskConfig.getList(Constant.SOURCE_FILES, String.class);
                 this.specifiedFileType = this.taskConfig.getNecessaryValue(Key.FILETYPE, HdfsPlusReaderErrorCode.REQUIRED_VALUE);
                 this.encoding = this.taskConfig.getString(com.alibaba.datax.plugin.unstructuredstorage.reader.Key.ENCODING, "UTF-8");
@@ -284,7 +284,7 @@ public class HdfsPlusReader extends Reader {
         @Override
         public void prepare() {
             LOG.info("prepare() begin...");
-            if (!StringUtils.isBlank(querySql)) {
+            if (!StringUtils.isEmpty(querySql)) {
                 String hiveCmd = "CREATE TABLE " + tmpTableName + " STORED AS ORC LOCATION '" + tmpPath + "' AS " + querySql;
                 LOG.info("prepare() hive cmd: {}", hiveCmd);
                 try {
@@ -302,7 +302,7 @@ public class HdfsPlusReader extends Reader {
         @Override
         public void startRead(RecordSender recordSender) {
             LOG.info("read start");
-            if (StringUtils.isBlank(this.querySql)) {
+            if (StringUtils.isEmpty(this.querySql)) {
                 for (String sourceFile : this.sourceFiles) {
                     LOG.info("reading file : {}", sourceFile);
                     if (specifiedFileType.equalsIgnoreCase(Constant.TEXT)
@@ -340,7 +340,7 @@ public class HdfsPlusReader extends Reader {
         @Override
         public void post() {
             LOG.info("post() begin...");
-            if (!StringUtils.isBlank(querySql)) {
+            if (!StringUtils.isEmpty(querySql)) {
                 String hiveCmd = "drop table " + tmpTableName;
                 LOG.info("post() hive cmd: {}", hiveCmd);
                 // 执行脚本，删除临时表
