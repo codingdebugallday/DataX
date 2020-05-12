@@ -174,16 +174,7 @@
             <outputDirectory>datax</outputDirectory>
         </fileSet>
 
-        <!--clickhouse reader-->
-        <fileSet>
-            <directory>clickhousereader/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-
-        <!--writer-->
+        <!-- writer -->
         <fileSet>
             <directory>mysqlwriter/target/datax/</directory>
             <includes>
@@ -254,7 +245,7 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <fileSet>
+		<fileSet>
             <directory>oraclewriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -268,7 +259,7 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
-        <fileSet>
+		<fileSet>
             <directory>postgresqlwriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
@@ -366,6 +357,13 @@
             </includes>
             <outputDirectory>datax</outputDirectory>
         </fileSet>
+        <fileSet>
+            <directory>clickhousewriter/target/datax/</directory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+            <outputDirectory>datax</outputDirectory>
+        </fileSet>
 
         <!--自定义插件 reader-->
         <fileSet>
@@ -410,15 +408,6 @@
         <!--自定义hook-->
         <fileSet>
             <directory>all-hook/target/datax/</directory>
-            <includes>
-                <include>**/*.*</include>
-            </includes>
-            <outputDirectory>datax</outputDirectory>
-        </fileSet>
-
-        <!--clickhouse writer-->
-        <fileSet>
-            <directory>clickhousewriter/target/datax/</directory>
             <includes>
                 <include>**/*.*</include>
             </includes>
