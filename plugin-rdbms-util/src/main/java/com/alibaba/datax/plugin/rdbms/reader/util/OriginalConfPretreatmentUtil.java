@@ -33,14 +33,6 @@ public final class OriginalConfPretreatmentUtil {
         simplifyConf(originalConfig);
     }
 
-    public static void doPretreatmentWithUnnecessary(Configuration originalConfig) {
-        // 检查 username/password 配置（可为空）
-        originalConfig.getUnnecessaryValue(Key.USERNAME, "", DBUtilErrorCode.MYSQL_CONN_USERPWD_ERROR);
-        originalConfig.getUnnecessaryValue(Key.PASSWORD, "", DBUtilErrorCode.MYSQL_CONN_USERPWD_ERROR);
-        dealWhere(originalConfig);
-        simplifyConf(originalConfig);
-    }
-
     public static void dealWhere(Configuration originalConfig) {
         String where = originalConfig.getString(Key.WHERE, null);
         if(StringUtils.isNotBlank(where)) {

@@ -18,8 +18,7 @@ public enum DataBaseType {
     PostgreSQL("postgresql", "org.postgresql.Driver"),
     RDBMS("rdbms", "com.alibaba.datax.plugin.rdbms.util.DataBaseType"),
     DB2("db2", "com.ibm.db2.jcc.DB2Driver"),
-    ADS("ads","com.mysql.jdbc.Driver"),
-    CLICKHOUSE("clickhouse", "ru.yandex.clickhouse.ClickHouseDriver");
+    ADS("ads","com.mysql.jdbc.Driver");
 
 
     private String typeName;
@@ -56,8 +55,6 @@ public enum DataBaseType {
             case PostgreSQL:
             	break;
             case RDBMS:
-                break;
-            case CLICKHOUSE:
                 break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
@@ -96,8 +93,6 @@ public enum DataBaseType {
             	break;
             case RDBMS:
                 break;
-            case CLICKHOUSE:
-                break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
         }
@@ -123,8 +118,6 @@ public enum DataBaseType {
             case DB2:
             case PostgreSQL:
             	break;
-            case CLICKHOUSE:
-                break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type.");
         }
@@ -148,8 +141,6 @@ public enum DataBaseType {
             case DB2:
             case PostgreSQL:
                 break;
-            case CLICKHOUSE:
-                break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type");
         }
@@ -172,8 +163,6 @@ public enum DataBaseType {
                 break;
             case PostgreSQL:
                 break;
-            case CLICKHOUSE:
-                break;
             default:
                 throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE, "unsupported database type");
         }
@@ -183,7 +172,6 @@ public enum DataBaseType {
 
     private static Pattern mysqlPattern = Pattern.compile("jdbc:mysql://(.+):\\d+/.+");
     private static Pattern oraclePattern = Pattern.compile("jdbc:oracle:thin:@(.+):\\d+:.+");
-    private static Pattern clickhousePattern = Pattern.compile("jdbc:clickhouse://(.+):\\d+/.+");
 
     /**
      * 注意：目前只实现了从 mysql/oracle 中识别出ip 信息.未识别到则返回 null.
@@ -194,10 +182,6 @@ public enum DataBaseType {
             return mysql.group(1);
         }
         Matcher oracle = oraclePattern.matcher(jdbcUrl);
-        if (oracle.matches()) {
-            return oracle.group(1);
-        }
-        Matcher clickhouse = clickhousePattern.matcher(jdbcUrl);
         if (oracle.matches()) {
             return oracle.group(1);
         }

@@ -1,23 +1,18 @@
-package com.alibaba.datax.plugin.writer.rdbmswriter;
+package com.alibaba.datax.plugin.reader.rdbmswriter;
 
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
 import com.alibaba.datax.common.spi.Writer;
 import com.alibaba.datax.common.util.Configuration;
-import com.alibaba.datax.plugin.rdbms.util.DBUtil;
 import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.alibaba.datax.plugin.rdbms.util.DataBaseType;
 import com.alibaba.datax.plugin.rdbms.writer.CommonRdbmsWriter;
 import com.alibaba.datax.plugin.rdbms.writer.Key;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class RdbmsWriter extends Writer {
     private static final DataBaseType DATABASE_TYPE = DataBaseType.RDBMS;
-
-    private static final Logger LOG = LoggerFactory.getLogger(RdbmsWriter.class);
 
     public static class Job extends Writer.Job {
         private Configuration originalConfig = null;
@@ -37,9 +32,7 @@ public class RdbmsWriter extends Writer {
                                         "写入模式(writeMode)配置有误. 因为不支持配置参数项 writeMode: %s, 仅使用insert sql 插入数据. 请检查您的配置并作出修改.",
                                         writeMode));
             }
-            LOG.info("================= start load driver ===================");
-            DBUtil.loadDriverClass("writer", "rdbms");
-            LOG.info("================= end load driver ===================");
+
             this.commonRdbmsWriterMaster = new SubCommonRdbmsWriter.Job(
                     DATABASE_TYPE);
             this.commonRdbmsWriterMaster.init(this.originalConfig);
@@ -85,8 +78,6 @@ public class RdbmsWriter extends Writer {
             this.commonRdbmsWriterSlave.prepare(this.writerSliceConfig);
         }
 
-
-        @Override
         public void startWrite(RecordReceiver recordReceiver) {
             this.commonRdbmsWriterSlave.startWrite(recordReceiver,
                     this.writerSliceConfig, super.getTaskPluginCollector());
