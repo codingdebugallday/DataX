@@ -1,1 +1,1 @@
-org.abigballofmud.datax.hook.service.app.impl.StoreDataxStatisticsHookImpl
+org.abigballofmud.datax.hook.service.impl.DataxStatisticsHookImpl

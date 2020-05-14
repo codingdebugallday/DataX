@@ -11,6 +11,10 @@
 
     <artifactId>all-hook</artifactId>
 
+    <properties>
+        <spring.version>5.2.6.RELEASE</spring.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.alibaba.datax</groupId>
@@ -53,6 +57,27 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>hikari-cp</groupId>
+            <artifactId>hikari-cp</artifactId>
+            <version>2.12.0</version>
+        </dependency>
 
     </dependencies>
 
@@ -87,6 +112,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>Clojars</id>
+            <name>Clojars Repository</name>
+            <url>https://clojars.org/repo/</url>
+        </repository>
+    </repositories>
 
 
 </project>
