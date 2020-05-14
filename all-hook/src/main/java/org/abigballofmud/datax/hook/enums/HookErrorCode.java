@@ -10,12 +10,12 @@ import com.alibaba.datax.common.spi.ErrorCode;
  * @author isacc 2020/5/13 19:40
  * @since 1.0
  */
-public enum  HookErrorCode implements ErrorCode {
+public enum HookErrorCode implements ErrorCode {
 
     /**
      * 加载statistics.properties出错
      */
-    LOAD_STATISTICS_PROPERTIES_ERROR("HookErrCode-01","加载statistics.properties出错");
+    LOAD_STATISTICS_PROPERTIES_ERROR("HookErrCode-01", "加载statistics.properties出错");
 
     private final String code;
 

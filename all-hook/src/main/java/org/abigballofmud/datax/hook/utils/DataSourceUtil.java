@@ -9,9 +9,9 @@ import java.util.Properties;
 
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.core.util.container.CoreConstant;
-import com.alibaba.datax.plugin.rdbms.util.DBUtilErrorCode;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.abigballofmud.datax.hook.enums.HookErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,7 +67,7 @@ public class DataSourceUtil {
             return properties;
         } catch (IOException e) {
             LOG.error("statistic error", e);
-            throw DataXException.asDataXException(DBUtilErrorCode.UNSUPPORTED_TYPE,
+            throw DataXException.asDataXException(HookErrorCode.LOAD_STATISTICS_PROPERTIES_ERROR,
                     "加载statistics.properties出错.");
         }
     }

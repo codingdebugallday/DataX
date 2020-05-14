@@ -11,6 +11,7 @@ import com.alibaba.datax.common.spi.Hook;
 import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.core.util.container.CoreConstant;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Maps;
 import org.abigballofmud.datax.hook.model.StatisticsDTO;
 import org.abigballofmud.datax.hook.utils.DataSourceUtil;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.CollectionUtils;
 
 /**
  * <p>
@@ -57,6 +59,7 @@ public class DataxStatisticsHookImpl implements Hook {
     }
 
     private Object[] genObjectArgArr(JobStatistics jobStatistics) {
+        List<Map<String, Object>> dirtyList = genDirtyList(jobStatistics);
         return new Object[]{
                 jobStatistics.getExecId(),
                 jobStatistics.getJsonFileName(),
@@ -72,7 +75,7 @@ public class DataxStatisticsHookImpl implements Hook {
                 jobStatistics.getTotalErrorRecords(),
                 jobStatistics.getJobPath(),
                 jobStatistics.getJobContent(),
-                genDirtyList(jobStatistics)
+                CollectionUtils.isEmpty(dirtyList) ? null : JSON.toJSONString(dirtyList)
         };
     }
 
