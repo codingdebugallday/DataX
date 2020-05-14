@@ -91,7 +91,7 @@ public class DataxStatisticsHookImpl implements Hook {
         Map<String, Object> tmp;
         for (Pair<Record, String> pair : dirtyRecordList) {
             map = Maps.newHashMapWithExpectedSize(dirtyRecordList.size());
-            map.put("errorMessage", pair.getRight().replace("'", "\\\""));
+            map.put("errorMessage", pair.getRight());
             List<Column> columnList = pair.getLeft().getColumnList();
             for (int i = 0, size = columnList.size(); i < size; i++) {
                 tmp = Maps.newHashMapWithExpectedSize(size);
