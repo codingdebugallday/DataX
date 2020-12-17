@@ -9,6 +9,12 @@ import com.alibaba.datax.common.spi.ErrorCode;
  */
 public enum FrameworkErrorCode implements ErrorCode {
 
+    /**
+     * DataX服务Zookeeper注册失败
+     */
+    ZK_REGISTER_FAILED("Framework-10000", "DataX服务Zookeeper注册失败"),
+    DO_INSTANCE_ERROR("Framework-10001", "DataX URL处理类IOC失败"),
+    JSON_FILE_ERROR("Framework-10002", "DataX Json文件创建失败"),
 	INSTALL_ERROR("Framework-00", "DataX引擎安装错误, 请联系您的运维解决 ."),
 	ARGUMENT_ERROR("Framework-01", "DataX引擎运行错误，该问题通常是由于内部编程错误引起，请联系DataX开发团队解决 ."),
 	RUNTIME_ERROR("Framework-02", "DataX引擎运行过程出错，具体原因请参看DataX运行结束时的错误诊断信息  ."),
@@ -28,6 +34,7 @@ public enum FrameworkErrorCode implements ErrorCode {
     CALL_DATAX_SERVICE_FAILED("Framework-18", "请求 DataX Service 出错."),
     CALL_REMOTE_FAILED("Framework-19", "远程调用失败"),
     KILLED_EXIT_VALUE("Framework-143", "Job 收到了 Kill 命令.");
+
 
     private final String code;
 

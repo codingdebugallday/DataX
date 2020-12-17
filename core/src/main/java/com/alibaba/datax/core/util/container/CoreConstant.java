@@ -1,8 +1,8 @@
 package com.alibaba.datax.core.util.container;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.File;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by jingxing on 14-8-25.
@@ -155,6 +155,9 @@ public class CoreConstant {
 
 	public static String DATAX_CONF_PATH = StringUtils.join(new String[] {
 			DATAX_HOME, "conf", "core.json" }, File.separator);
+
+	public static String DATAX_SERVER_CONF_PATH = StringUtils.join(new String[] {
+			DATAX_HOME, "conf", "server.properties" }, File.separator);
 
 	public static String DATAX_CONF_STATISTICS_PATH = StringUtils.join(new String[] {
 			DATAX_HOME, "conf", "statistics.properties" }, File.separator);

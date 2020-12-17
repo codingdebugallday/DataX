@@ -137,6 +137,14 @@
         <appender-ref ref="PERF" />
     </logger>
 
+    <logger name="com.alibaba.datax"  level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <logger name="io.netty"  level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
     <root level="${loglevel:-INFO}">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
