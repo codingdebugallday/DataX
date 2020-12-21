@@ -10,6 +10,7 @@ import com.alibaba.datax.app.client.UrlHandler;
 import com.alibaba.datax.app.context.JobLogCollectorContext;
 import com.alibaba.datax.app.pojo.DataxJobInfo;
 import com.alibaba.datax.app.pojo.Result;
+import com.alibaba.datax.app.utils.CommonUtils;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.core.Engine;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
@@ -45,6 +46,8 @@ public class DataxJobUrlHandler implements UrlHandler {
                 return doDataxJobWithJson(dataxJobInfo);
             }
             return doDataxJob(dataxJobInfo);
+        } catch (Exception e) {
+            return Result.fail("datax job execute error", CommonUtils.getMessage(e));
         } finally {
             JobLogCollectorContext.clear();
         }

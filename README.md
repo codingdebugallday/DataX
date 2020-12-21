@@ -1,5 +1,18 @@
 ![Datax-logo](https://github.com/alibaba/DataX/blob/master/images/DataX-logo.jpg)
 
+**DataX分布式集群化：**
+
+- ##### 基于netty改造，使用zookeeper作为注册中心
+        
+        使用netty作为http服务器，可自行提供url处理，类似spring mvc
+        datax启动后注册到zookeeper，下游服务可从zookeeper中获取datax集群，提供负载等。
+  
+- ##### 提供rest api的方式去提交datax job
+      
+        POST http://ip:port/datax/job
+
+##### 请参考：[DataX分布式集群化](./datax-cluster.md)
+
 **基于DataX自定义插件，已自定义插件：** 
 
 - ##### [otsplusreader](./otsplusreader/doc/otsplusreader.md)

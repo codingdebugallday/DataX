@@ -36,6 +36,12 @@ public class HttpServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
 
+    private final int port;
+
+    public HttpServer(int port) {
+        this.port = port;
+    }
+
     public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workGroup = new NioEventLoopGroup();
@@ -56,9 +62,9 @@ public class HttpServer {
                             pipeline.addLast(new HttpRequestHandler());
                         }
                     });
-            ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(0)).sync();
-            int port = ((NioServerSocketChannel) channelFuture.channel()).localAddress().getPort();
-            register(port);
+            ChannelFuture channelFuture = bootstrap.bind(new InetSocketAddress(port)).sync();
+            int realPort = ((NioServerSocketChannel) channelFuture.channel()).localAddress().getPort();
+            register(realPort);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -67,13 +73,13 @@ public class HttpServer {
         }
     }
 
-    private void register(int port) {
+    private void register(int realPort) {
         String ip = getLocalIp();
-        LOG.debug("DataX server: {}:{}", ip, port);
+        LOG.debug("DataX server: {}:{}", ip, realPort);
         // 封装注册信息
         RegisterDataxInfo registerDataxInfo = new RegisterDataxInfo();
         // url
-        registerDataxInfo.setUrl(String.format("http://%s:%d", ip, port));
+        registerDataxInfo.setUrl(String.format("http://%s:%d", ip, realPort));
         // weight 可在server.properties配置 默认为1
         registerDataxInfo.setWeight(ZookeeperRegister.getWeight());
         // 注册到zk

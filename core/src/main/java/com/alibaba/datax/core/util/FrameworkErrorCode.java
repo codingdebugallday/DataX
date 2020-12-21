@@ -15,6 +15,7 @@ public enum FrameworkErrorCode implements ErrorCode {
     ZK_REGISTER_FAILED("Framework-10000", "DataX服务Zookeeper注册失败"),
     DO_INSTANCE_ERROR("Framework-10001", "DataX URL处理类IOC失败"),
     JSON_FILE_ERROR("Framework-10002", "DataX Json文件创建失败"),
+    PORT_CONFIG_ERROR("Framework-10003", "DataX集群指定端口启动错误，使用方式，示例：--port 19565"),
 	INSTALL_ERROR("Framework-00", "DataX引擎安装错误, 请联系您的运维解决 ."),
 	ARGUMENT_ERROR("Framework-01", "DataX引擎运行错误，该问题通常是由于内部编程错误引起，请联系DataX开发团队解决 ."),
 	RUNTIME_ERROR("Framework-02", "DataX引擎运行过程出错，具体原因请参看DataX运行结束时的错误诊断信息  ."),

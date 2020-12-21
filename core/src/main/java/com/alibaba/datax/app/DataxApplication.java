@@ -2,6 +2,12 @@ package com.alibaba.datax.app;
 
 import com.alibaba.datax.app.server.HttpServer;
 import com.alibaba.datax.app.utils.UrlHandlerUtil;
+import com.alibaba.datax.common.exception.DataXException;
+import com.alibaba.datax.core.util.FrameworkErrorCode;
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 /**
  * <p>
@@ -26,9 +32,19 @@ public class DataxApplication {
      * System.setProperty("datax.home", "E:/myGitCode/MyDatax/target/datax/datax")
      */
     public static void main(String[] args) {
+        CommandLine cl;
+        try {
+            Options options = new Options();
+            options.addOption("port", false, "DataX Node Port Config.");
+            BasicParser parser = new BasicParser();
+            cl = parser.parse(options, args);
+        } catch (ParseException e) {
+            throw DataXException.asDataXException(FrameworkErrorCode.PORT_CONFIG_ERROR,e);
+        }
+        String port = cl.getOptionValue("port", "0");
         // 扫描@RequestMapping IOC
         UrlHandlerUtil.doInstance(DataxApplication.class.getPackage().getName());
-        HttpServer server = new HttpServer();
+        HttpServer server = new HttpServer(Integer.parseInt(port));
         server.start();
     }
 }
