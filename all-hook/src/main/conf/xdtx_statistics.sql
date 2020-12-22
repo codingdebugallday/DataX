@@ -20,10 +20,10 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for xdtx_statistics
 -- ----------------------------
-DROP TABLE IF EXISTS `xdtx_statistics`;
-CREATE TABLE `xdtx_statistics`  (
+DROP TABLE IF EXISTS `datax_statistics`;
+CREATE TABLE `datax_statistics`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `exec_id` int(11) NULL DEFAULT NULL COMMENT 'azkaban执行id',
+  `exec_id` int(11) NULL DEFAULT NULL COMMENT '执行id',
   `json_file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'datax执行的json文件名',
   `job_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'job名称',
   `reader_plugin` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT 'reader插件名称',
@@ -39,6 +39,6 @@ CREATE TABLE `xdtx_statistics`  (
   `job_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT 'datax的json内容',
   `dirty_records` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT '脏数据即未同步成功的数据',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

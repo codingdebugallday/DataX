@@ -18,7 +18,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 public class StatisticsDTO {
 
-    public static final String INSERT_SQL = "INSERT INTO xdtx_statistics(exec_id, json_file_name, job_name, reader_plugin, writer_plugin, start_time, end_time, total_costs, byte_speed_per_second, record_speed_per_second, total_read_records, total_error_records, job_path, job_content, dirty_records)" +
+    public static final String INSERT_SQL = "INSERT INTO datax_statistics(exec_id, json_file_name, job_name, reader_plugin, writer_plugin, start_time, end_time, total_costs, byte_speed_per_second, record_speed_per_second, total_read_records, total_error_records, job_path, job_content, dirty_records)" +
             " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     public static final int[] ARG_TYPES = new int[]{4, 12, 12, 12, 12, 12, 12, 12, 12, 12, -5, -5, 12, -1, -1};
