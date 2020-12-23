@@ -2,7 +2,7 @@
 # shellcheck disable=SC2046
 source /etc/profile
 
-DATAX_HOME=E:/myGitCode/MyDatax/target/datax/datax
+DATAX_HOME=$(pwd)/..
 PID_FILE=datax.pid
 
 if [ -f "${PID_FILE}" ]; then
