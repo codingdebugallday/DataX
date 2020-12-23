@@ -55,7 +55,7 @@ public class ZookeeperRegister {
                     // 临时有序节点
                     .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
                     .forPath("/cluster/server", data.getBytes(StandardCharsets.UTF_8));
-            LOG.debug("Datax Server register, info: {}", data);
+            LOG.info("Datax Server register, info: {}", data);
         } catch (Exception e) {
             LOG.error("register server error");
             throw DataXException.asDataXException(FrameworkErrorCode.ZK_REGISTER_FAILED, "DataX Server注册失败", e);

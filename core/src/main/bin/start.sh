@@ -1,8 +1,16 @@
 #!/bin/bash
-
+# shellcheck disable=SC2046
 source /etc/profile
 
 DATAX_HOME=E:/myGitCode/MyDatax/target/datax/datax
+PID_FILE=datax.pid
+
+if [ -f "${PID_FILE}" ]; then
+    if [ $(sed -n "$=" "${PID_FILE}") -gt 2 ]; then
+        echo "本地datax集群最多启动三个！！！目前已启动三个本地节点！！！"
+        exit 1
+    fi
+fi
 
 nohup java -server -Xms1g -Xmx1g \
 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${DATAX_HOME}/log \
@@ -14,4 +22,6 @@ nohup java -server -Xms1g -Xmx1g \
 -classpath $DATAX_HOME/lib/*:. \
 -Dloglevel=info \
 -Dlog.file.name=datax-server \
-com.alibaba.datax.app.DataxApplication & echo $! > datax.pid
+com.alibaba.datax.app.DataxApplication >/dev/null 2>&1 & echo $! >> datax.pid
+
+echo "datax app started."

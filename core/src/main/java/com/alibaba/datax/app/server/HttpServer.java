@@ -75,7 +75,7 @@ public class HttpServer {
 
     private void register(int realPort) {
         String ip = getLocalIp();
-        LOG.debug("DataX server: {}:{}", ip, realPort);
+        LOG.info("DataX server: {}:{}", ip, realPort);
         // 封装注册信息
         RegisterDataxInfo registerDataxInfo = new RegisterDataxInfo();
         // url
