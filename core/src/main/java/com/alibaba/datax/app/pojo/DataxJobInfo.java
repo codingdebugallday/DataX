@@ -10,10 +10,18 @@ package com.alibaba.datax.app.pojo;
  */
 public class DataxJobInfo {
 
+    /**
+     * 如下是datax自带的，运行需要此三个参数
+     */
     private String mode = "standalone";
     private Long jobId = -1L;
     private String job;
+    /**
+     * 如下是自定义
+     */
     private String jobJson;
+    private String jobName;
+    private Integer recordLog;
 
     public String getMode() {
         return mode;
@@ -45,5 +53,21 @@ public class DataxJobInfo {
 
     public void setJobJson(String jobJson) {
         this.jobJson = jobJson;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public Integer getRecordLog() {
+        return recordLog;
+    }
+
+    public void setRecordLog(Integer recordLog) {
+        this.recordLog = recordLog;
     }
 }

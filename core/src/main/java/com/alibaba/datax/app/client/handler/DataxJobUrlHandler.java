@@ -3,11 +3,11 @@ package com.alibaba.datax.app.client.handler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.alibaba.datax.app.client.RequestMapping;
 import com.alibaba.datax.app.client.UrlHandler;
-import com.alibaba.datax.app.context.JobLogCollectorContext;
 import com.alibaba.datax.app.pojo.DataxJobInfo;
 import com.alibaba.datax.app.pojo.Result;
 import com.alibaba.datax.app.utils.CommonUtils;
@@ -19,6 +19,9 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * <p>
@@ -31,16 +34,20 @@ import org.apache.commons.lang3.StringUtils;
 @RequestMapping(value = "/datax/job", method = "POST")
 public class DataxJobUrlHandler implements UrlHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DataxJobUrlHandler.class);
+
     private static final int KILLED_EXIT_CODE = 143;
     private static final int FAIL_EXIT_CODE = 1;
+    private static final String LOG_FILE_NAME = "jobIdAndJobName";
+    private static final String LOG_DIR = String.format("%s/log/cluster", System.getProperty("datax.home"));
 
     @SuppressWarnings("unchecked")
     @Override
     public Result<String> handle(FullHttpRequest request) {
         try {
-            JobLogCollectorContext.setLogCollector(new StringBuilder());
             String body = request.content().toString(CharsetUtil.UTF_8);
             DataxJobInfo dataxJobInfo = JSON.parseObject(body, DataxJobInfo.class);
+            MDC.put(LOG_FILE_NAME, String.format("%d_%s", dataxJobInfo.getJobId(), dataxJobInfo.getJobName()));
             if (StringUtils.isNotEmpty(dataxJobInfo.getJobJson())) {
                 // jobJson优先级高 根据json生成临时文件
                 return doDataxJobWithJson(dataxJobInfo);
@@ -49,13 +56,13 @@ public class DataxJobUrlHandler implements UrlHandler {
         } catch (Exception e) {
             return Result.fail("datax job execute error", CommonUtils.getMessage(e));
         } finally {
-            JobLogCollectorContext.clear();
+            MDC.remove(LOG_FILE_NAME);
         }
     }
 
     private Result<String> doDataxJob(DataxJobInfo dataxJobInfo) {
         String[] params = genJobParamArray(dataxJobInfo);
-        return doDataxJob(params);
+        return doDataxJob(dataxJobInfo, params);
     }
 
     private Result<String> doDataxJobWithJson(DataxJobInfo dataxJobInfo) {
@@ -76,17 +83,27 @@ public class DataxJobUrlHandler implements UrlHandler {
         }
     }
 
-    private Result<String> doDataxJob(String[] params) {
+    private Result<String> doDataxJob(DataxJobInfo dataxJobInfo, String[] params) {
         int exitCode = Engine.doMain(params);
+        // 是否需记录日志
+        if (Objects.nonNull(dataxJobInfo.getRecordLog()) && dataxJobInfo.getRecordLog() == 1) {
+            // 记录日志
+            LOG.info("record datax job log: {}.log", MDC.get(LOG_FILE_NAME));
+        }
+        return doJobWithoutRecordLog(exitCode);
+    }
+
+    private Result<String> doJobWithoutRecordLog(int exitCode) {
+        String logPath = String.format("%s/%s.log", LOG_DIR, MDC.get(LOG_FILE_NAME));
         if (exitCode == FAIL_EXIT_CODE) {
             // 1 失败
-            return Result.fail("fail", JobLogCollectorContext.current().toString());
+            return Result.fail("fail", logPath);
         } else if (exitCode == KILLED_EXIT_CODE) {
             // 143 Killed
-            return Result.fail("killed", JobLogCollectorContext.current().toString());
+            return Result.fail("killed", logPath);
         }
         // 0 正常执行完
-        return Result.ok(JobLogCollectorContext.current().toString());
+        return Result.ok(logPath);
     }
 
     private String[] genJobParamArray(DataxJobInfo dataxJobInfo) {

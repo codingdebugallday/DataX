@@ -7,7 +7,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.alibaba.datax.app.context.JobLogCollectorContext;
 import com.alibaba.datax.common.element.ColumnCast;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.ErrorCode;
@@ -90,7 +89,6 @@ public class Engine {
             priority = Integer.parseInt(System.getenv("SKYNET_PRIORITY"));
         } catch (NumberFormatException e) {
             LOG.warn("prioriy set to 0, because NumberFormatException, the value is: " + System.getProperty("PROIORY"));
-            JobLogCollectorContext.append("prioriy set to 0, because NumberFormatException, the value is: " + System.getProperty("PROIORY"));
         }
 
         Configuration jobInfoConfig = allConf.getConfiguration(CoreConstant.DATAX_JOB_JOBINFO);
@@ -168,14 +166,11 @@ public class Engine {
         VMInfo vmInfo = VMInfo.getVmInfo();
         if (vmInfo != null) {
             LOG.info(vmInfo.toString());
-            JobLogCollectorContext.append(vmInfo.toString());
         }
 
         LOG.info("\n" + Engine.filterJobConfiguration(configuration) + "\n");
-        JobLogCollectorContext.append(Engine.filterJobConfiguration(configuration));
 
         LOG.debug(configuration.toJSON());
-        JobLogCollectorContext.append(configuration.toJSON());
 
         ConfigurationValidate.doValidate(configuration);
         Engine engine = new Engine();
@@ -234,13 +229,8 @@ public class Engine {
     }
 
     public static void main(String[] args) {
-        try {
-            JobLogCollectorContext.setLogCollector(new StringBuilder());
-            int exitCode = doMain(args);
-            System.exit(exitCode);
-        } finally {
-            JobLogCollectorContext.clear();
-        }
+        int exitCode = doMain(args);
+        System.exit(exitCode);
     }
 
     public static int doMain(String[] args) {
@@ -250,7 +240,6 @@ public class Engine {
         } catch (Throwable e) {
             exitCode = 1;
             LOG.error("\n\n经DataX智能分析,该任务最可能的错误原因是:\n" + ExceptionTracker.trace(e));
-            JobLogCollectorContext.append("\n\n经DataX智能分析,该任务最可能的错误原因是:\n" + ExceptionTracker.trace(e));
 
             if (e instanceof DataXException) {
                 DataXException tempException = (DataXException) e;

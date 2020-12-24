@@ -35,7 +35,7 @@ public class DataxApplication {
         CommandLine cl;
         try {
             Options options = new Options();
-            options.addOption("port", false, "DataX Node Port Config.");
+            options.addOption("port", true, "DataX Node Port Config.");
             BasicParser parser = new BasicParser();
             cl = parser.parse(options, args);
         } catch (ParseException e) {

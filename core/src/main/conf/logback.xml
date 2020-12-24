@@ -24,6 +24,26 @@
         </encoder>
     </appender>
 
+    <!-- datax集群使用此appender-->
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <!--discriminator鉴别器，根据jobIdAndJobName这个key对应的value鉴别日志事件，然后委托给具体appender写日志-->
+        <discriminator>
+            <key>jobIdAndJobName</key>
+            <defaultValue>server</defaultValue>
+        </discriminator>
+        <sift>
+            <!--具体的写日志appender，每一个jobIdAndJobName创建一个文件-->
+            <appender name="${jobIdAndJobName}" class="ch.qos.logback.core.FileAppender">
+                <file>${log.dir}/cluster/${jobIdAndJobName}.log</file>
+                <append>true</append>
+                <encoder charset="UTF-8">
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n
+                    </pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
     <appender name="PERF" class="ch.qos.logback.core.FileAppender">
         <encoder>UTF-8</encoder>
         <file>${perf.dir}/${ymd}/${log.file.name}-${byMillionSecond}.log</file>
@@ -137,17 +157,10 @@
         <appender-ref ref="PERF" />
     </logger>
 
-    <logger name="com.alibaba.datax"  level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
-    <logger name="io.netty"  level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
     <root level="${loglevel:-INFO}">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
+        <appender-ref ref="SIFT" />
         <!--
         <appender-ref ref="USER_FILE" />
         <appender-ref ref="BAD_RECORD_FILE" />
