@@ -1,1 +1,2 @@
-org.abigballofmud.datax.hook.service.impl.DataxStatisticsHookImpl
+com.github.thestyleofme.datax.hook.app.DataxStatisticsHook
+com.github.thestyleofme.datax.hook.app.DataxJobLogHook

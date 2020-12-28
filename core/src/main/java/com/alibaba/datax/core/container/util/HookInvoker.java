@@ -14,8 +14,8 @@ import java.util.ServiceLoader;
 import com.alibaba.datax.common.exception.CommonErrorCode;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.spi.Hook;
-import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.common.statistics.JobStatistics;
+import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.JarLoader;
 import org.slf4j.Logger;
@@ -72,14 +72,16 @@ public class HookInvoker {
             Thread.currentThread().setContextClassLoader(jarLoader);
             Iterator<Hook> hookIt = ServiceLoader.load(Hook.class).iterator();
             if (!hookIt.hasNext()) {
-                LOG.warn("No hook defined under path: " + path);
+                LOG.warn("No hook defined under path: {}", path);
             } else {
-                Hook hook = hookIt.next();
-                LOG.info("Invoke hook [{}], path: {}", hook.getName(), path);
-                hook.invoke(conf, msg, jobStatistics);
+                while (hookIt.hasNext()) {
+                    Hook hook = hookIt.next();
+                    LOG.info("Invoke hook [{}], path: {}", hook.getName(), path);
+                    hook.invoke(conf, msg, jobStatistics);
+                }
             }
         } catch (Exception e) {
-            LOG.error("Exception when invoke hook", e);
+            LOG.error("Exception when invoke hook");
             throw DataXException.asDataXException(
                     CommonErrorCode.HOOK_INTERNAL_ERROR, "Exception when invoke hook", e);
         } finally {
@@ -89,6 +91,6 @@ public class HookInvoker {
 
     public static void main(String[] args) {
         new HookInvoker("/Users/xiafei/workspace/datax3/target/datax/datax/hook",
-                null, new HashMap<String, Number>(), null).invokeAll();
+                null, new HashMap<>(4), null).invokeAll();
     }
 }

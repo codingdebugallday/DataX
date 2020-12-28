@@ -1,6 +1,6 @@
 package com.alibaba.datax.app.context;
 
-import com.alibaba.datax.app.pojo.DataxJobInfo;
+import com.alibaba.datax.app.pojo.DataxJobExecutor;
 import com.alibaba.ttl.TransmittableThreadLocal;
 
 /**
@@ -17,16 +17,16 @@ public class DataxJobContext {
         throw new IllegalStateException("context class!");
     }
 
-    private static final TransmittableThreadLocal<DataxJobInfo> DATAX_JOB_CONTEXT_THREAD_LOCAL =
+    private static final TransmittableThreadLocal<DataxJobExecutor> DATAX_JOB_CONTEXT_THREAD_LOCAL =
             new TransmittableThreadLocal<>();
 
 
-    public static DataxJobInfo current() {
+    public static DataxJobExecutor current() {
         return DATAX_JOB_CONTEXT_THREAD_LOCAL.get();
     }
 
-    public static void setLogCollector(DataxJobInfo dataxJobInfo) {
-        DATAX_JOB_CONTEXT_THREAD_LOCAL.set(dataxJobInfo);
+    public static void setDataxJobExecuteInfo(DataxJobExecutor dataxJobExecutor) {
+        DATAX_JOB_CONTEXT_THREAD_LOCAL.set(dataxJobExecutor);
     }
 
     public static void clear() {

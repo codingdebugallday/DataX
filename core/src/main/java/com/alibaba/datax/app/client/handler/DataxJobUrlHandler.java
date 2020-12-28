@@ -3,11 +3,13 @@ package com.alibaba.datax.app.client.handler;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.alibaba.datax.app.client.RequestMapping;
 import com.alibaba.datax.app.client.UrlHandler;
+import com.alibaba.datax.app.context.DataxJobContext;
+import com.alibaba.datax.app.pojo.DataxJobExecutor;
 import com.alibaba.datax.app.pojo.DataxJobInfo;
 import com.alibaba.datax.app.pojo.Result;
 import com.alibaba.datax.app.utils.CommonUtils;
@@ -47,7 +49,9 @@ public class DataxJobUrlHandler implements UrlHandler {
         try {
             String body = request.content().toString(CharsetUtil.UTF_8);
             DataxJobInfo dataxJobInfo = JSON.parseObject(body, DataxJobInfo.class);
-            MDC.put(LOG_FILE_NAME, String.format("%d_%s", dataxJobInfo.getJobId(), dataxJobInfo.getJobName()));
+            MDC.put(LOG_FILE_NAME, String.format("%d_%s", dataxJobInfo.getJobId(),
+                    Optional.ofNullable(dataxJobInfo.getJobName()).orElse("UNKNOWN")));
+            recordExecutorInfo(request.headers().get("HOST"), dataxJobInfo);
             if (StringUtils.isNotEmpty(dataxJobInfo.getJobJson())) {
                 // jobJson优先级高 根据json生成临时文件
                 return doDataxJobWithJson(dataxJobInfo);
@@ -60,9 +64,18 @@ public class DataxJobUrlHandler implements UrlHandler {
         }
     }
 
+    private void recordExecutorInfo(String host, DataxJobInfo dataxJobInfo) {
+        DataxJobExecutor dataxJobExecutor = new DataxJobExecutor();
+        dataxJobExecutor.setJobId(dataxJobInfo.getJobId());
+        dataxJobExecutor.setJobName(dataxJobInfo.getJobName());
+        dataxJobExecutor.setLogPath(String.format("%s/%s.log", LOG_DIR, MDC.get(LOG_FILE_NAME)));
+        dataxJobExecutor.setNode(host);
+        DataxJobContext.setDataxJobExecuteInfo(dataxJobExecutor);
+    }
+
     private Result<String> doDataxJob(DataxJobInfo dataxJobInfo) {
         String[] params = genJobParamArray(dataxJobInfo);
-        return doDataxJob(dataxJobInfo, params);
+        return doDataxJob(params);
     }
 
     private Result<String> doDataxJobWithJson(DataxJobInfo dataxJobInfo) {
@@ -83,13 +96,9 @@ public class DataxJobUrlHandler implements UrlHandler {
         }
     }
 
-    private Result<String> doDataxJob(DataxJobInfo dataxJobInfo, String[] params) {
+    private Result<String> doDataxJob(String[] params) {
         int exitCode = Engine.doMain(params);
-        // 是否需记录日志
-        if (Objects.nonNull(dataxJobInfo.getRecordLog()) && dataxJobInfo.getRecordLog() == 1) {
-            // 记录日志
-            LOG.info("record datax job log: {}.log", MDC.get(LOG_FILE_NAME));
-        }
+        LOG.info("record datax job log: {}.log", MDC.get(LOG_FILE_NAME));
         return doJobWithoutRecordLog(exitCode);
     }
 
@@ -107,13 +116,15 @@ public class DataxJobUrlHandler implements UrlHandler {
     }
 
     private String[] genJobParamArray(DataxJobInfo dataxJobInfo) {
-        String[] params = new String[6];
+        String[] params = new String[8];
         params[0] = "-mode";
         params[1] = dataxJobInfo.getMode();
         params[2] = "-jobid";
         params[3] = String.valueOf(dataxJobInfo.getJobId());
         params[4] = "-job";
         params[5] = dataxJobInfo.getJob();
+        params[6] = "-name";
+        params[7] = dataxJobInfo.getJobName();
         return params;
     }
 }

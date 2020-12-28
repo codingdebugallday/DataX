@@ -159,8 +159,8 @@ public class CoreConstant {
 	public static String DATAX_SERVER_CONF_PATH = StringUtils.join(new String[] {
 			DATAX_HOME, "conf", "server.properties" }, File.separator);
 
-	public static String DATAX_CONF_STATISTICS_PATH = StringUtils.join(new String[] {
-			DATAX_HOME, "conf", "statistics.properties" }, File.separator);
+	public static String DATAX_CONF_HOOK_PATH = StringUtils.join(new String[] {
+			DATAX_HOME, "conf", "hook.properties" }, File.separator);
 
 	public static String DATAX_CONF_LOG_PATH = StringUtils.join(new String[] {
 			DATAX_HOME, "conf", "logback.xml" }, File.separator);

@@ -14,7 +14,7 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <!--<appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <encoder>UTF-8</encoder>
         <file>${log.dir}/${ymd}/${log.file.name}-${byMillionSecond}.log</file>
         <append>false</append>
@@ -22,7 +22,7 @@
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n
             </pattern>
         </encoder>
-    </appender>
+    </appender>-->
 
     <!-- datax集群使用此appender-->
     <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
@@ -44,7 +44,7 @@
         </sift>
     </appender>
 
-    <appender name="PERF" class="ch.qos.logback.core.FileAppender">
+    <!--<appender name="PERF" class="ch.qos.logback.core.FileAppender">
         <encoder>UTF-8</encoder>
         <file>${perf.dir}/${ymd}/${log.file.name}-${byMillionSecond}.log</file>
         <append>false</append>
@@ -52,7 +52,7 @@
             <pattern>%msg%n
             </pattern>
         </encoder>
-    </appender>
+    </appender>-->
 
     <!-- 按照每天生成日志文件(对 DataX 不适应，DataX 是一个进程一个日志) -->
     <!--

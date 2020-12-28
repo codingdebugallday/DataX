@@ -1,5 +1,6 @@
-package org.abigballofmud.datax.hook.model;
+package com.github.thestyleofme.datax.hook.model;
 
+import javax.persistence.*;
 
 import lombok.*;
 
@@ -16,19 +17,22 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class StatisticsDTO {
+@Entity
+@Table(name = "datax_statistics")
+public class DataxStatistics {
 
-    public static final String INSERT_SQL = "INSERT INTO datax_statistics(exec_id, json_file_name, job_name, reader_plugin, writer_plugin, start_time, end_time, total_costs, byte_speed_per_second, record_speed_per_second, total_read_records, total_error_records, job_path, job_content, dirty_records)" +
-            " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    public static final int[] ARG_TYPES = new int[]{4, 12, 12, 12, 12, 12, 12, 12, 12, 12, -5, -5, 12, -1, -1};
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * azkaban执行id
+     * 执行id，其他调度平台的执行id
      */
-    private String execId;
+    private Long execId;
+    /**
+     * datax的jobid
+     */
+    private Long jobId;
     /**
      * datax执行的json文件名
      */
@@ -37,6 +41,14 @@ public class StatisticsDTO {
      * job名称
      */
     private String jobName;
+    /**
+     * datax执行的json路径
+     */
+    private String jobPath;
+    /**
+     * datax的json内容
+     */
+    private String jobContent;
     /**
      * reader插件名称
      */
@@ -73,14 +85,6 @@ public class StatisticsDTO {
      * 读写失败总数
      */
     private Long totalErrorRecords;
-    /**
-     * datax执行的json路径
-     */
-    private String jobPath;
-    /**
-     * datax的json内容
-     */
-    private String jobContent;
     /**
      * 脏数据即未同步成功的数据
      */

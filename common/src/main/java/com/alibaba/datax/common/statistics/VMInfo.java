@@ -1,8 +1,5 @@
 package com.alibaba.datax.common.statistics;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.OperatingSystemMXBean;
@@ -11,6 +8,9 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by liqiang on 15/11/12.
@@ -112,6 +112,7 @@ public class VMInfo {
         }
     }
 
+    @Override
     public String toString() {
         return "the machine info  => \n\n"
                 + "\tosInfo:\t" + osInfo + "\n"

@@ -1,8 +1,6 @@
 package com.alibaba.datax.common.statistics;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import com.alibaba.datax.common.element.Record;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,28 +10,32 @@ import org.apache.commons.lang3.tuple.Pair;
  * DataX任务信息统计
  * </p>
  *
- * @author abigballofmud 2020/01/02 17:48
+ * @author thestyleofme 2020/01/02 17:48
  * @since 1.0
  */
 public class JobStatistics {
 
     private Long id;
     /**
-     * datax执行的json文件名
+     * 执行id，其他调度平台的执行id
      */
-    private String jobPath;
+    private Long execId;
+    /**
+     * datax的jobid
+     */
+    private Long jobId;
     /**
      * datax执行的json文件名
      */
     private String jsonFileName;
     /**
-     * azkaban job名称
+     * job名称
      */
     private String jobName;
     /**
-     * azkaban执行ID
+     * datax执行的json文件名
      */
-    private Long execId;
+    private String jobPath;
     /**
      * DataX json字符串
      */
@@ -85,6 +87,14 @@ public class JobStatistics {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Long jobId) {
+        this.jobId = jobId;
     }
 
     public String getJobPath() {
@@ -209,13 +219,17 @@ public class JobStatistics {
 
     // ", dirtyRecordList.size()=" + (Objects.isNull(dirtyRecordList) ? 0 : dirtyRecordList.size()) +
 
+
     @Override
     public String toString() {
         return "JobStatistics{" +
-                "jobPath='" + jobPath + '\'' +
+                "id=" + id +
+                ", execId=" + execId +
+                ", jobId=" + jobId +
                 ", jsonFileName='" + jsonFileName + '\'' +
                 ", jobName='" + jobName + '\'' +
-                ", execId=" + execId +
+                ", jobPath='" + jobPath + '\'' +
+                ", jobContent='" + jobContent + '\'' +
                 ", readerPlugin='" + readerPlugin + '\'' +
                 ", writerPlugin='" + writerPlugin + '\'' +
                 ", startTime='" + startTime + '\'' +
@@ -225,7 +239,7 @@ public class JobStatistics {
                 ", recordSpeedPerSecond='" + recordSpeedPerSecond + '\'' +
                 ", totalReadRecords=" + totalReadRecords +
                 ", totalErrorRecords=" + totalErrorRecords +
-                ", dirtyRecordList.size()=" + (Objects.isNull(dirtyRecordList) ? 0 : dirtyRecordList.size()) +
+                ", dirtyRecordList=" + dirtyRecordList +
                 '}';
     }
 }

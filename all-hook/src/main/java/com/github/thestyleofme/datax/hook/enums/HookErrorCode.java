@@ -1,4 +1,4 @@
-package org.abigballofmud.datax.hook.enums;
+package com.github.thestyleofme.datax.hook.enums;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 
@@ -13,9 +13,9 @@ import com.alibaba.datax.common.spi.ErrorCode;
 public enum HookErrorCode implements ErrorCode {
 
     /**
-     * 加载statistics.properties出错
+     * 加载hook.properties出错
      */
-    LOAD_STATISTICS_PROPERTIES_ERROR("HookErrCode-01", "加载statistics.properties出错");
+    LOAD_STATISTICS_PROPERTIES_ERROR("HookErrCode-01", "加载hook.properties出错");
 
     private final String code;
 

@@ -21,7 +21,6 @@ public class DataxJobInfo {
      */
     private String jobJson;
     private String jobName;
-    private Integer recordLog;
 
     public String getMode() {
         return mode;
@@ -63,11 +62,4 @@ public class DataxJobInfo {
         this.jobName = jobName;
     }
 
-    public Integer getRecordLog() {
-        return recordLog;
-    }
-
-    public void setRecordLog(Integer recordLog) {
-        this.recordLog = recordLog;
-    }
 }

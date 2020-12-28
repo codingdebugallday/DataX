@@ -13,14 +13,14 @@
 			<includes>
 				<include>*</include>
 			</includes>
-			<outputDirectory>hook/abigballofmud</outputDirectory>
+			<outputDirectory>hook/thestyleofme</outputDirectory>
 		</fileSet>
 		<fileSet>
 			<directory>target/</directory>
 			<includes>
 				<include>all-hook-0.0.1-SNAPSHOT.jar</include>
 			</includes>
-			<outputDirectory>hook/abigballofmud</outputDirectory>
+			<outputDirectory>hook/thestyleofme</outputDirectory>
 		</fileSet>
 		<!-- for configs -->
 		<fileSet>
@@ -35,7 +35,7 @@
 	<dependencySets>
 		<dependencySet>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputDirectory>hook/abigballofmud/libs</outputDirectory>
+			<outputDirectory>hook/thestyleofme/libs</outputDirectory>
 			<scope>runtime</scope>
 		</dependencySet>
 	</dependencySets>

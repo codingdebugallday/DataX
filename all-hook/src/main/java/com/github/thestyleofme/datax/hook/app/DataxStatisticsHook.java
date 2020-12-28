@@ -1,4 +1,4 @@
-package org.abigballofmud.datax.hook.service.impl;
+package com.github.thestyleofme.datax.hook.app;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,13 +12,14 @@ import com.alibaba.datax.common.statistics.JobStatistics;
 import com.alibaba.datax.common.util.Configuration;
 import com.alibaba.datax.core.util.container.CoreConstant;
 import com.alibaba.fastjson.JSON;
+import com.github.thestyleofme.datax.hook.model.DataxStatistics;
+import com.github.thestyleofme.datax.hook.repository.DataxStatisticsRepository;
+import com.github.thestyleofme.datax.hook.utils.HookUtil;
 import com.google.common.collect.Maps;
-import org.abigballofmud.datax.hook.model.StatisticsDTO;
-import org.abigballofmud.datax.hook.utils.DataSourceUtil;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -29,54 +30,35 @@ import org.springframework.util.CollectionUtils;
  * @author isacc 2020/5/13 17:36
  * @since 1.0
  */
-public class DataxStatisticsHookImpl implements Hook {
+public class DataxStatisticsHook implements Hook {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataxStatisticsHookImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataxStatisticsHook.class);
 
     @Override
     public String getName() {
-        return "abigballofmud store datax statistics hook";
+        return "store datax statistics hook";
     }
 
     @Override
     public void invoke(Configuration jobConf, Map<String, Number> msg, JobStatistics jobStatistics) {
-        LOG.info("into abigballofmud store datax statistics hook");
-        LOG.info("jobStatistics: {}", jobStatistics);
-        LOG.info("load statistics.properties, path: {}", CoreConstant.DATAX_CONF_STATISTICS_PATH);
+        LOG.info("datax statistics hook...");
+        LOG.info("load hook.properties, path: {}", CoreConstant.DATAX_CONF_HOOK_PATH);
         handle(jobStatistics);
     }
 
     private void handle(JobStatistics jobStatistics) {
-        JdbcTemplate jdbcTemplate = DataSourceUtil.getJdbcTemplate();
-        int update = jdbcTemplate.update(StatisticsDTO.INSERT_SQL,
-                genObjectArgArr(jobStatistics),
-                StatisticsDTO.ARG_TYPES);
-        if (update > 0) {
-            LOG.info("jobStatistics insert into table success");
-        } else {
-            LOG.error("store to db error");
+        try {
+            DataxStatisticsRepository dataxStatisticsRepository = HookUtil.getBean(DataxStatisticsRepository.class);
+            DataxStatistics dataxStatistics = new DataxStatistics();
+            BeanUtils.copyProperties(jobStatistics, dataxStatistics);
+            // 脏数据格式转换
+            List<Map<String, Object>> dirtyList = genDirtyList(jobStatistics);
+            dataxStatistics.setDirtyRecords(CollectionUtils.isEmpty(dirtyList) ? null : JSON.toJSONString(dirtyList));
+            dataxStatisticsRepository.save(dataxStatistics);
+            LOG.info("datax job statistics insert into table success");
+        } catch (Exception e) {
+            LOG.error("datax job statistics insert error", e);
         }
-    }
-
-    private Object[] genObjectArgArr(JobStatistics jobStatistics) {
-        List<Map<String, Object>> dirtyList = genDirtyList(jobStatistics);
-        return new Object[]{
-                jobStatistics.getExecId(),
-                jobStatistics.getJsonFileName(),
-                jobStatistics.getJobName(),
-                jobStatistics.getReaderPlugin(),
-                jobStatistics.getWriterPlugin(),
-                jobStatistics.getStartTime(),
-                jobStatistics.getEndTime(),
-                jobStatistics.getTotalCosts(),
-                jobStatistics.getByteSpeedPerSecond(),
-                jobStatistics.getRecordSpeedPerSecond(),
-                jobStatistics.getTotalReadRecords(),
-                jobStatistics.getTotalErrorRecords(),
-                jobStatistics.getJobPath(),
-                jobStatistics.getJobContent(),
-                CollectionUtils.isEmpty(dirtyList) ? null : JSON.toJSONString(dirtyList)
-        };
     }
 
     private List<Map<String, Object>> genDirtyList(JobStatistics jobStatistics) {
