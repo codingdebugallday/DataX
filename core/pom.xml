@@ -18,6 +18,17 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.55.Final</version>
         </dependency>
+        <!--hook 用到了数据源-->
+        <dependency>
+            <groupId>hikari-cp</groupId>
+            <artifactId>hikari-cp</artifactId>
+            <version>2.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.48</version>
+        </dependency>
         <!-- 注意: curator & zookeeper version，这里版本需与自己zk集群兼容-->
         <dependency>
             <groupId>org.apache.curator</groupId>
@@ -137,6 +148,25 @@
             <version>2.1.9</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Nexus aliyun</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>Clojars</id>
+            <name>Clojars Repository</name>
+            <url>https://clojars.org/repo/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>

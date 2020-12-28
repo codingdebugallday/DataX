@@ -19,6 +19,10 @@ public class DataxJobExecutor {
      */
     private String jobName;
     /**
+     * 执行此job的datax节点的ip
+     */
+    private String ip;
+    /**
      * 执行此job的datax节点
      */
     private String node;
@@ -41,6 +45,14 @@ public class DataxJobExecutor {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getNode() {

@@ -33,6 +33,10 @@ public class DataxJobLog {
      */
     private String jobName;
     /**
+     * 执行此job的datax节点的ip
+     */
+    private String ip;
+    /**
      * 执行此job的datax节点
      */
     private String node;

@@ -11,7 +11,7 @@
  Target Server Version : 50726
  File Encoding         : 65001
 
- Date: 28/12/2020 11:22:23
+ Date: 28/12/2020 19:59:26
 */
 
 SET NAMES utf8mb4;
@@ -25,10 +25,12 @@ CREATE TABLE `datax_job_log`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `job_id` bigint(20) NOT NULL DEFAULT -1 COMMENT 'datax jobid，最好保持唯一性',
   `job_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'datax job名称',
+  `ip` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'datax节点的ip地址',
   `node` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '执行此job的datax节点',
   `log_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '执行此job的log日志文件所在路径',
-  `log_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT 'log具体内容',
-  PRIMARY KEY (`id`) USING BTREE
+  `log_content` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL COMMENT 'log具体内容',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `datax_log_u1`(`job_id`, `ip`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
 
 -- ----------------------------

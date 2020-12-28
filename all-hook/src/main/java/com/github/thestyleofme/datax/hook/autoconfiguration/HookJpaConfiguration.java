@@ -5,9 +5,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
-import com.github.thestyleofme.datax.hook.utils.HookUtil;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import com.alibaba.datax.app.context.HookDatasourceContext;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,8 +38,7 @@ public class HookJpaConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        HikariConfig hikariConfig = new HikariConfig(HookUtil.loadStatisticProperties());
-        return new HikariDataSource(hikariConfig);
+        return HookDatasourceContext.getDatasource();
     }
 
     @Bean

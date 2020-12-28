@@ -69,6 +69,7 @@ public class DataxJobUrlHandler implements UrlHandler {
         dataxJobExecutor.setJobId(dataxJobInfo.getJobId());
         dataxJobExecutor.setJobName(dataxJobInfo.getJobName());
         dataxJobExecutor.setLogPath(String.format("%s/%s.log", LOG_DIR, MDC.get(LOG_FILE_NAME)));
+        dataxJobExecutor.setIp(host.split(":")[0]);
         dataxJobExecutor.setNode(host);
         DataxJobContext.setDataxJobExecuteInfo(dataxJobExecutor);
     }
