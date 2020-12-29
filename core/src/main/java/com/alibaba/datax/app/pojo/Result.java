@@ -39,8 +39,11 @@ public class Result<T> {
         return new Result<>(false, 200, null, data, null);
     }
 
+    public static <T> Result<T> ok(T data, String message) {
+        return new Result<>(false, 200, message, data, null);
+    }
 
-    public static Result<Void> fail(String message) {
+    public static <T> Result<T> fail(String message) {
         return new Result<>(true, 500, message, null, TYPE_ERROR);
     }
 

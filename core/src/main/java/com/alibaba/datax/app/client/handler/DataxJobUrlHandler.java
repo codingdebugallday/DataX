@@ -97,23 +97,25 @@ public class DataxJobUrlHandler implements UrlHandler {
         }
     }
 
+    /**
+     * 提交后返回jobId
+     *
+     * @param params String[]
+     * @return Result<String>
+     */
     private Result<String> doDataxJob(String[] params) {
         int exitCode = Engine.doMain(params);
         LOG.info("record datax job log: {}.log", MDC.get(LOG_FILE_NAME));
-        return doJobWithoutRecordLog(exitCode);
-    }
-
-    private Result<String> doJobWithoutRecordLog(int exitCode) {
-        String logPath = String.format("%s/%s.log", LOG_DIR, MDC.get(LOG_FILE_NAME));
+        // params[3] jobId
         if (exitCode == FAIL_EXIT_CODE) {
             // 1 失败
-            return Result.fail("fail", logPath);
+            return Result.fail(params[3], "FAILED");
         } else if (exitCode == KILLED_EXIT_CODE) {
             // 143 Killed
-            return Result.fail("killed", logPath);
+            return Result.fail(params[3], "KILLED");
         }
-        // 0 正常执行完
-        return Result.ok(logPath);
+        // 0 正常执行完 -> 即只是交给datax去运行了 同步是否有错需看日志
+        return Result.ok(params[3], "SUCCEEDED");
     }
 
     private String[] genJobParamArray(DataxJobInfo dataxJobInfo) {
