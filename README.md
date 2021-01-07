@@ -10,8 +10,12 @@
 - ##### 提供rest api的方式去提交datax job
       
         POST http://ip:port/datax/job
+  
+- ##### 可配合[datax-admin](https://github.com/thestyleofme/datax-admin.git) 服务进行使用
+      
+        datax任务创建/datax-admin统一执行datax/负载均衡等
 
-##### 请参考：[DataX分布式集群化](./datax-cluster.md)
+##### 请参考：[DataX分布式集群化详情](./datax-cluster.md)
 
 **基于DataX自定义插件，已自定义插件：** 
 
