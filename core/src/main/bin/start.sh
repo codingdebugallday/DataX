@@ -12,14 +12,17 @@ if [ -f "${PID_FILE}" ]; then
     fi
 fi
 
+# 可开启debug 方便调试，添加如下到19行处即可
+# -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10024 \
+
 nohup java -server -Xms1g -Xmx1g \
--XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${DATAX_HOME}/log \
--Ddatax.home=${DATAX_HOME} \
+-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath="${DATAX_HOME}"/log \
+-Ddatax.home="${DATAX_HOME}" \
 -Dfile.encoding=UTF-8 \
--Dlogback.configurationFile=${DATAX_HOME}/conf/logback.xml \
+-Dlogback.configurationFile="${DATAX_HOME}"/conf/logback.xml \
 -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener \
 -Djava.security.egd=file:///dev/urandom \
--classpath $DATAX_HOME/lib/*:. \
+-classpath "$DATAX_HOME"/lib/*:. \
 -Dloglevel=info \
 -Dlog.file.name=datax-server \
 com.alibaba.datax.app.DataxApplication >/dev/null 2>&1 & echo $! >> datax.pid
