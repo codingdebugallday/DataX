@@ -25,8 +25,8 @@ public class DataxApplication {
      * 可设置vm参数
      * -Dfile.encoding=UTF-8
      * -Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener
-     * -Ddatax.home=E:/myGitCode/MyDatax/target/datax/datax
-     * -Dlogback.configurationFile=E:/myGitCode/MyDatax/core/src/main/conf/logback.xml
+     * -Ddatax.home=/Users/xielei/IdeaProjects/MyDatax/target/datax/datax
+     * -Dlogback.configurationFile=/Users/xielei/IdeaProjects/MyDatax/core/src/main/conf/logback.xml
      * <p>
      * 也可程序指定
      * System.setProperty("datax.home", "E:/myGitCode/MyDatax/target/datax/datax")

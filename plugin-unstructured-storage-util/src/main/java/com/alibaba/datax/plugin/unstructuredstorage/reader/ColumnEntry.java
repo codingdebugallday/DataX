@@ -2,15 +2,18 @@ package com.alibaba.datax.plugin.unstructuredstorage.reader;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.alibaba.fastjson.JSON;
 
 public class ColumnEntry {
+
     private Integer index;
     private String type;
     private String value;
+    private List<String> filter;
     private String format;
     private DateFormat dateParse;
 
@@ -36,6 +39,14 @@ public class ColumnEntry {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public List<String> getFilter() {
+        return filter;
+    }
+
+    public void setFilter(List<String> filter) {
+        this.filter = filter;
     }
 
     public String getFormat() {
