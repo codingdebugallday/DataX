@@ -1,12 +1,17 @@
 package com.alibaba.datax.app.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import com.alibaba.datax.app.client.RequestMapping;
 import com.alibaba.datax.app.client.UrlHandler;
@@ -27,6 +32,7 @@ import org.slf4j.LoggerFactory;
 public class UrlHandlerUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(UrlHandlerUtil.class);
+    private static final String CLASS_SUFFIX = ".class";
 
     private UrlHandlerUtil() {
     }
@@ -43,9 +49,27 @@ public class UrlHandlerUtil {
     }
 
     private static void doScan(String scanPackage) {
-        URL resource = Thread.currentThread().getContextClassLoader().getResource("");
-        String classpath = Objects.requireNonNull(resource).getPath();
-        String scanPackagePath = classpath + scanPackage.replace(".", "/");
+        try {
+            Enumeration<URL> urlEnumeration = Thread.currentThread().getContextClassLoader()
+                    .getResources(scanPackage.replace(".", "/"));
+            while (urlEnumeration.hasMoreElements()) {
+                URL url = urlEnumeration.nextElement();
+                String protocol = url.getProtocol();
+                if ("jar".equalsIgnoreCase(protocol)) {
+                    // 生产时 是扫描jar包里面的类 即使用start.sh脚本启动的
+                    doScanByJar(scanPackage, url);
+                } else if ("file".equalsIgnoreCase(protocol)) {
+                    // 本地idea运行时 扫描文件即可
+                    doScanByFile(scanPackage, url);
+                }
+            }
+        } catch (IOException e) {
+            throw DataXException.asDataXException(FrameworkErrorCode.DO_INSTANCE_ERROR, "DataX URL处理类IOC失败");
+        }
+    }
+
+    private static void doScanByFile(String scanPackage, URL url) {
+        String scanPackagePath = Objects.requireNonNull(url).getPath();
         File packageFile = new File(scanPackagePath);
         File[] files = packageFile.listFiles();
         if (files == null || files.length == 0) {
@@ -54,9 +78,27 @@ public class UrlHandlerUtil {
         for (File file : Objects.requireNonNull(files)) {
             if (file.isDirectory()) {
                 doScan(scanPackage + "." + file.getName());
-            } else if (file.getName().endsWith(".class")) {
-                String className = scanPackage + "." + file.getName().replace(".class", "");
+            } else if (file.getName().endsWith(CLASS_SUFFIX)) {
+                String className = scanPackage + "." + file.getName().replace(CLASS_SUFFIX, "");
                 CLASS_NAMES.add(className);
+            }
+        }
+    }
+
+    private static void doScanByJar(String scanPackage, URL url) throws IOException {
+        JarURLConnection connection = (JarURLConnection) url.openConnection();
+        if (connection != null) {
+            JarFile jarFile = connection.getJarFile();
+            if (jarFile != null) {
+                Enumeration<JarEntry> jarEntryEnumeration = jarFile.entries();
+                while (jarEntryEnumeration.hasMoreElements()) {
+                    JarEntry entry = jarEntryEnumeration.nextElement();
+                    String jarEntryName = entry.getName().replace("/", ".");
+                    if (jarEntryName.contains(CLASS_SUFFIX) && jarEntryName.startsWith(scanPackage)) {
+                        String className = jarEntryName.substring(0, jarEntryName.lastIndexOf("."));
+                        CLASS_NAMES.add(className);
+                    }
+                }
             }
         }
     }
