@@ -13,6 +13,14 @@
 
 ![img.png](./DataxApplication.png)
 
+```
+-Dfile.encoding=UTF-8
+-Dlogback.statusListenerClass=ch.qos.logback.core.status.NopStatusListener
+-Ddatax.home=/Users/xielei/IdeaProjects/myDataX/target/datax/datax
+-Dlogback.configurationFile=/Users/xielei/IdeaProjects/myDataX/core/src/main/conf/logback.xml
+-Dloglevel=debug
+```
+
 > shell方式
 
 ```

@@ -55,12 +55,12 @@ public class UrlHandlerUtil {
             while (urlEnumeration.hasMoreElements()) {
                 URL url = urlEnumeration.nextElement();
                 String protocol = url.getProtocol();
-                if ("jar".equalsIgnoreCase(protocol)) {
-                    // 生产时 是扫描jar包里面的类 即使用start.sh脚本启动的
-                    doScanByJar(scanPackage, url);
-                } else if ("file".equalsIgnoreCase(protocol)) {
+                if ("file".equalsIgnoreCase(protocol)) {
                     // 本地idea运行时 扫描文件即可
                     doScanByFile(scanPackage, url);
+                } else if ("jar".equalsIgnoreCase(protocol)) {
+                    // 生产时 是扫描jar包里面的类 即使用start.sh脚本启动的
+                    doScanByJar(scanPackage, url);
                 }
             }
         } catch (IOException e) {

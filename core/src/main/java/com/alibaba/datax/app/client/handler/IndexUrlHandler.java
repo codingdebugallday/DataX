@@ -7,7 +7,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 
 /**
  * <p>
- * 测试连接
+ * 测试连接，也作为心跳检测的请求
  * </p>
  *
  * @author isaac 2020/12/16 10:25

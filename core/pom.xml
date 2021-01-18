@@ -18,6 +18,12 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.55.Final</version>
         </dependency>
+        <!-- 心跳检测需要http请求-->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.0</version>
+        </dependency>
         <!--hook 用到了数据源-->
         <dependency>
             <groupId>hikari-cp</groupId>

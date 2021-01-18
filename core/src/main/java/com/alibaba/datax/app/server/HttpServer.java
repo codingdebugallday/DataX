@@ -2,13 +2,18 @@ package com.alibaba.datax.app.server;
 
 import java.net.*;
 import java.util.Enumeration;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import com.alibaba.datax.app.server.handler.HttpRequestHandler;
 import com.alibaba.datax.app.server.register.RegisterDataxInfo;
 import com.alibaba.datax.app.server.register.ZookeeperRegister;
+import com.alibaba.datax.app.utils.HttpProvider;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.fastjson.JSON;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -74,6 +79,36 @@ public class HttpServer {
     }
 
     private void register(int realPort) {
+        // 立即注册
+        RegisterDataxInfo registerDataxInfo = fetchRegisterInfo(realPort);
+        ZookeeperRegister.register(JSON.toJSONString(registerDataxInfo));
+        // 1分钟后开始心跳检测 每隔一定时间心跳检测一次 这里暂时30秒吧
+        ThreadFactory factory = new ThreadFactoryBuilder()
+                .setNameFormat("datax-heart-check-%d")
+                .setDaemon(true)
+                .build();
+        new ScheduledThreadPoolExecutor(2, factory).scheduleWithFixedDelay(
+                () -> heartbeatCheck(registerDataxInfo),
+                60,
+                30,
+                TimeUnit.SECONDS
+        );
+    }
+
+    private void heartbeatCheck(RegisterDataxInfo registerDataxInfo) {
+        boolean ping = HttpProvider.ping(registerDataxInfo.getUrl() + "/index");
+        if (!ping) {
+            // 心跳检测失败 直接退出
+            LOG.error("ping datax server error");
+            System.exit(-1);
+        }
+        if (!ZookeeperRegister.exist(registerDataxInfo.getUrl())) {
+            ZookeeperRegister.register(JSON.toJSONString(registerDataxInfo));
+        }
+        LOG.debug("ping datax server success...");
+    }
+
+    private RegisterDataxInfo fetchRegisterInfo(int realPort) {
         String ip = getLocalIp();
         LOG.info("DataX server: {}:{}", ip, realPort);
         // 封装注册信息
@@ -82,8 +117,7 @@ public class HttpServer {
         registerDataxInfo.setUrl(String.format("http://%s:%d", ip, realPort));
         // weight 可在server.properties配置 默认为1
         registerDataxInfo.setWeight(ZookeeperRegister.getWeight());
-        // 注册到zk
-        ZookeeperRegister.register(JSON.toJSONString(registerDataxInfo));
+        return registerDataxInfo;
     }
 
     private String getLocalIp() {

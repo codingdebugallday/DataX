@@ -5,11 +5,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.core.util.FrameworkErrorCode;
 import com.alibaba.datax.core.util.container.CoreConstant;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -30,6 +35,8 @@ import org.slf4j.LoggerFactory;
 public class ZookeeperRegister {
 
     private static final Logger LOG = LoggerFactory.getLogger(ZookeeperRegister.class);
+    private static final String NODE_NAME = "cluster/server";
+    private static final String ROOT_PATH = "cluster";
 
     private ZookeeperRegister() {
     }
@@ -54,8 +61,37 @@ public class ZookeeperRegister {
                     .creatingParentsIfNeeded()
                     // 临时有序节点
                     .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
-                    .forPath("/cluster/server", data.getBytes(StandardCharsets.UTF_8));
+                    .forPath("/" + NODE_NAME, data.getBytes(StandardCharsets.UTF_8));
             LOG.info("Datax Server register, info: {}", data);
+        } catch (Exception e) {
+            LOG.error("register server error");
+            throw DataXException.asDataXException(FrameworkErrorCode.ZK_REGISTER_FAILED, "DataX Server注册失败", e);
+        }
+    }
+
+    public static boolean exist(String url) {
+        Optional<RegisterDataxInfo> optional = list().stream()
+                .filter(o -> o.getUrl().equals(url))
+                .findFirst();
+        return optional.isPresent();
+    }
+
+    public static List<RegisterDataxInfo> list() {
+        try {
+            return CURATOR_FRAMEWORK.getChildren()
+                    .forPath("/" + ROOT_PATH)
+                    .stream()
+                    .map(s -> {
+                        try {
+                            byte[] bytes = CURATOR_FRAMEWORK.getData().forPath("/" + ROOT_PATH + "/" + s);
+                            return JSON.parseObject(new String(bytes, StandardCharsets.UTF_8), RegisterDataxInfo.class);
+                        } catch (Exception e) {
+                            LOG.error("refresh error");
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             LOG.error("register server error");
             throw DataXException.asDataXException(FrameworkErrorCode.ZK_REGISTER_FAILED, "DataX Server注册失败", e);
